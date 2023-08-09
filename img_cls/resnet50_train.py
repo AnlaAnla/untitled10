@@ -66,8 +66,8 @@ model_path = "Code/ML/model/card_cls/res_card_out854_freeze6.pth"
 
 if platform.system() == 'Windows':
     print('这是Windows系统')
-    data_dir = os.path.join('D:', data_dir)
-    model_path = os.path.join('D:', model_path)
+    data_dir = os.path.join('D:/', data_dir)
+    model_path = os.path.join('D:/', model_path)
 elif platform.system() == 'Linux':
     print('这是Linux系统')
     data_dir = os.path.join("/mnt/d", data_dir)
@@ -219,7 +219,7 @@ if __name__ == '__main__':
     model_ft.fc = nn.Linear(num_ftrs, class_num)
 
     # model_ft.fc = torch.nn.Linear(in_features=2048, out_features=854)
-    model_ft.load_state_dict(torch.load(model_path))
+    # model_ft.load_state_dict(torch.load(model_path))
     # model_ft.fc = nn.Linear(num_ftrs, class_num)
     # wsl
     # model_ft.load_state_dict(torch.load(r"D:\Code\ML\model\card_cls\res101_card_out854_freeze1.pth", map_location=device))

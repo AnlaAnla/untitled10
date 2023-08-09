@@ -17,53 +17,6 @@ import platform
 cudnn.benchmark = True
 plt.ion()  # interactive mode
 
-data_transforms = {
-    'train': transforms.Compose([
-        # transforms.Resize((224, 224)),
-        transforms.RandAugment(),
-        # transforms.RandomResizedCrop(224),
-        # transforms.RandomHorizontalFlip(),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-    'val': transforms.Compose([
-        # transforms.Resize((224, 224)),
-        # transforms.Resize(256),
-        # transforms.CenterCrop(224),
-        transforms.ToTensor(),
-        transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-    ]),
-}
-
-data_phase = ['train', 'val']
-
-data_dir = "D:/Code/ML/images/Mywork3/train_data4_224"
-model_path = "D:/Code/ML/model/card_cls/effcient_card_out1945_freeze6.pth"
-
-# if platform.system() == 'Windows':
-#     print('这是Windows系统')
-#     data_dir = os.path.join('D:/', data_dir)
-#     model_path = os.path.join('D:/', model_path)
-# elif platform.system() == 'Linux':
-#     print('这是Linux系统')
-#     data_dir = os.path.join("/mnt/d", data_dir)
-#     model_path = os.path.join("/mnt/d", model_path)
-# else:
-#     print(platform.system())
-
-print('dataset: ', data_dir)
-print('model_path', model_path)
-
-image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
-                  for x in data_phase}
-dataloaders = {
-    x: torch.utils.data.DataLoader(image_datasets[x], batch_size=32, shuffle=True, num_workers=16, pin_memory=True)
-    for x in data_phase}
-dataset_sizes = {x: len(image_datasets[x]) for x in data_phase}
-class_names = image_datasets['train'].classes
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-
 
 def imshow(inp, title=None):
     inp = inp.numpy().transpose((1, 2, 0))
@@ -161,57 +114,114 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     print(f'Training complete in {time_elapsed // 60:.0f}m {time_elapsed % 60:.0f}s')
     print(f'Best val Acc: {best_acc:4f}')
 
-    # load best model weights
+    # 加载在验证集中表现最好的模型
     model.load_state_dict(best_model_wts)
 
     return model
 
 
-if __name__ == '__main__':
-    # # Get a batch of training data
-    # inputs, classes = next(iter(dataloaders['train']))
-    #
-    # # Make a grid from batch
-    # out = torchvision.utils.make_grid(inputs)
-    # imshow(out, title=[class_names[x] for x in classes])
+def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None, is_freeze=False, freeze_num=7):
 
-    # model_ft = torchvision.models.resnet50(pretrained=True)
+    # 如果不加载训练过的模型则加载预训练模型
+    if load_my_model:
+        model = models.resnet50()
+        # 修改最后一层
+        num_features = model.fc.in_features
+        model.fc = nn.Linear(num_features, class_num)
 
-    # num_ftrs = model_ft.fc.in_features
-    # model_ft.fc = nn.Linear(num_ftrs, len(class_names))
-    class_num = len(class_names)
-    print('class:', class_num)
+        model.load_state_dict(torch.load(model_path))
 
-    model = models.efficientnet_b7(pretrained=False)
-
-    # 修改最后一层
-    model.classifier = torch.nn.Sequential(
-        torch.nn.Linear(in_features=2560, out_features=class_num, bias=False)
-    )
-    # model.load_state_dict(torch.load(model_path))
-
-    # model.classifier = torch.nn.Sequential(
-    #     torch.nn.Linear(in_features=2560, out_features=class_num, bias=False)
-    # )
-
-    # 冻结部分参数
-    for i, c in enumerate(model.features.children()):
-        if i == 8:
-            break
-        for param in c.parameters():
-            param.requires_grad = False
-
-    for param in model.features.parameters():
-        print(param.requires_grad)
-
+    else:
+        model = models.resnet50(pretrained=False)
+        # 修改最后一层
+        num_features = model.fc.in_features
+        model.fc = nn.Linear(num_features, class_num)
 
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer_ft = optim.SGD(model.parameters(), lr=0.004, momentum=0.9)
+    optimizer_ft = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
-    model = train_model(model, criterion, optimizer_ft,
-                        exp_lr_scheduler, num_epochs=15)
+    # 冻结部分参数
+    if is_freeze:
+        for i, c in enumerate(model.children()):
+            if i == freeze_num:
+                break
+            for param in c.parameters():
+                param.requires_grad = False
 
-    torch.save(model.state_dict(), 'effcient_card_out1945_freeze6.pth')
+        for param in model.parameters():
+            print(param.requires_grad)
+
+    model = train_model(model, criterion, optimizer_ft,
+                        exp_lr_scheduler, num_epochs=epoch)
+
+    torch.save(model.state_dict(), save_path)
+
+
+if __name__ == '__main__':
+    data_dir = r"D:/Code/ML/images/Mywork3/train_test"
+    model_path = "D:/Code/ML/model/card_cls/resnet.pth"
+
+    # if platform.system() == 'Windows':
+    #     print('这是Windows系统')
+    #     # data_dir = os.path.join('D:', data_dir)
+    #     # model_path = os.path.join('D:', model_path)
+    # elif platform.system() == 'Linux':
+    #     print('这是Linux系统')
+    #     data_dir = os.path.join("/mnt/d", data_dir)
+    #     model_path = os.path.join("/mnt/d", model_path)
+    # else:
+    #     print(platform.system())
+
+    print('dataset: ', data_dir)
+    print('model_path', model_path)
+
+    data_transforms = {
+        'train': transforms.Compose([
+            # transforms.Resize((224, 224)),
+            # transforms.RandAugment(),
+
+            # transforms.RandomResizedCrop(224),
+            # transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'val': transforms.Compose([
+            # transforms.Resize((224, 224)),
+
+            # transforms.Resize(256),
+            # transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+    }
+
+    data_phase = ['train', 'val']
+    image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x), data_transforms[x])
+                      for x in data_phase}
+    dataloaders = {
+        x: torch.utils.data.DataLoader(image_datasets[x], batch_size=32, shuffle=True, num_workers=16, pin_memory=True)
+        for x in data_phase}
+    dataset_sizes = {x: len(image_datasets[x]) for x in data_phase}
+    class_names = image_datasets['train'].classes
+
+    device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+
+    class_num = len(class_names)
+    print('class:', class_num)
+
+    '''
+    epoch: 训练次数
+    save_path: 模型保存路径
+    load_my_model: 是否加载训练过的模型
+    model_path: 加载的模型路径 
+    is_freeze: 是否冻结模型部分层数
+    freeze_num: 冻结层数
+    '''
+    data_phase = ['train', 'val']
+    # 数据集路径在本文件上面
+    train(epoch=25, save_path='resent_card_out1945_freeze1.pth',
+          load_my_model=False, model_path=model_path,
+          is_freeze=True)

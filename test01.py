@@ -1,5 +1,6 @@
 import os
 
+
 # Get the list of files in the folder
 folder_path = r"D:\Code\ML\images\Mywork3\card_database\mosaic\20-21"
 files = os.listdir(folder_path)

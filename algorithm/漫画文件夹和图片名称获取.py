@@ -1,6 +1,6 @@
 import os
 
-father_dir = r"E:\College\college\image\[毛玉牛乳 (玉之けだま)] 汉化合集 V2"
+father_dir = r"E:\College\college\image\[正経同人 (As109)] 作品合集"
 
 i = 0
 data = []

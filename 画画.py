@@ -2,30 +2,16 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.animation as animation
 
-fig = plt.figure(figsize=(6, 6))
-ax = plt.gca()
-ax.grid()
+fig = plt.figure()  # 定义新的三维坐标轴
+ax3 = plt.axes(projection='3d')
 
-ln1, = ax.plot([], [], '_', lw=2)
-ln2, = ax.plot([], [], '_', color='r', lw=2)
-theta = np.linspace(0, 2*np.pi, 100)
-r_out = 1
-r_in = 0.5
+# 定义三维数据
+xx = np.arange(-50, 50, 0.05)
+yy = np.arange(-50, 50, 0.05)
+X, Y = np.meshgrid(xx, yy)
+Z = X * Y
 
-def init():
-    ax.set_xlim(-2, 2)
-    ax.set_ylim(-2, 2)
-    x_out = [r_out * np.cos(theta[i]) for i in range(len(theta))]
-    y_out = [r_out * np.sin(theta[i]) for i in range(len(theta))]
-    ln1.set_data(x_out, y_out)
-    return ln1
-def update(i):
-    x_in = [(r_out - r_in) * np.cos(theta[i]) + r_in * np.cos(theta[j]) for j in range(len(theta))]
-    y_in = [(r_out - r_in) * np.sin(theta[i]) + r_in * np.sin(theta[j]) for j in range(len(theta))]
-    ln2.set_data(x_in, y_in)
-    return ln2
-
-ani = animation.FuncAnimation(fig, update, range(len(theta)), init_func=init, interval=30)
-ani.save('roll.gif', writer='imagemagick', fps=100)
-
+# 作图
+ax3.plot_surface(X, Y, Z, cmap='rainbow')
+# ax3.contour(X,Y,Z, zdim='z',offset=-2，cmap='rainbow)   #等高线图，要设置offset，为Z的最小值
 plt.show()

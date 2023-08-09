@@ -1,10 +1,32 @@
-import os
+from Crypto.PublicKey import RSA
+from Crypto.Cipher import PKCS1_OAEP
+import binascii
 
-path = r"D:\Download\Loli\国学\30"
+# 生成RSA密钥
+keyPair = RSA.generate(bits=1024)
+pubKey = keyPair.publickey()
+pubKeyPEM = pubKey.exportKey()
+privKeyPEM = keyPair.exportKey()
 
-for name in os.listdir(path):
-    if name.count('1.txt') == 1:
-        new_name = name.replace('1.txt', '')
-        os.rename(os.path.join(path, name), os.path.join(path, new_name))
+print(f"Public key:  {pubKeyPEM.decode('ascii')}")
+print(f"Private key: {privKeyPEM.decode('ascii')}")
 
-print('end')
+# 使用公钥进行加密
+def encrypy(msg):
+    msg = msg.encode('utf-8')
+    encryptor = PKCS1_OAEP.new(pubKey)
+    encrypted = encryptor.encrypt(msg)
+    print("Encrypted:", binascii.hexlify(encrypted))
+    return encrypted
+
+# 使用私钥进行解密
+def decrypt(encrypted):
+    decryptor = PKCS1_OAEP.new(keyPair)
+    decrypted = decryptor.decrypt(encrypted)
+    print('Decrypted:', decrypted.decode('utf-8'))
+    return decrypted
+
+msg = '它是目前最重要的加密算法！计算机通信安全的基'
+
+secret = encrypy(msg)
+
