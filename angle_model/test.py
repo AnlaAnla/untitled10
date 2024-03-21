@@ -24,11 +24,12 @@ if __name__ == '__main__':
 
     # model = AngleNet()
     # model.load_state_dict(torch.load('angle_model03.pth'))
-    model = torch.load('angle_model04.pt')
+    model = torch.load(r"C:\Code\ML\Model\angle_model04.pt")
+    print(model)
     model.eval()
 
     # print(model)
-    dir_path = r"C:\Code\ML\Image\angle_data\train\img"
+    dir_path = r"C:\Code\ML\Image\angle_data\test\img"
     for img_name in os.listdir(dir_path):
         img_path = os.path.join(dir_path, img_name)
         img = transform_image(img_path)

@@ -161,7 +161,7 @@ def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None
 
 
 if __name__ == '__main__':
-    data_dir = r"D:/Code/ML/images/Mywork3/train_test"
+    data_dir = r"C:\Code\ML\Image\card_cls\train_data4_224"
     model_path = "D:/Code/ML/model/card_cls/resnet.pth"
 
     # if platform.system() == 'Windows':
@@ -223,5 +223,6 @@ if __name__ == '__main__':
     data_phase = ['train', 'val']
     # 数据集路径在本文件上面
     train(epoch=25, save_path='resent_card_out1945_freeze1.pth',
-          load_my_model=False, model_path=model_path,
+          load_my_model=False,
+          # model_path=model_path,
           is_freeze=True)

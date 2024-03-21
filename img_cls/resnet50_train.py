@@ -61,7 +61,7 @@ data_phase = ['train', 'val']
 # data_phase = ['train']
 
 
-data_dir = "Code/ML/images/Mywork3/train_data4_224"
+data_dir = r"C:\Code\ML\Image\card_cls\train_data4_224"
 model_path = "Code/ML/model/card_cls/res_card_out854_freeze6.pth"
 
 if platform.system() == 'Windows':

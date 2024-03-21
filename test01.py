@@ -1,14 +1,32 @@
 import os
+import torch
+import torchvision
+from torchvision import datasets, transforms
+import PIL.Image as Image
 
+import matplotlib.pyplot as plt
 
-# Get the list of files in the folder
-folder_path = r"D:\Code\ML\images\Mywork3\card_database\mosaic\20-21"
-files = os.listdir(folder_path)
+data_transforms = {
+        'train': transforms.Compose([
+            # transforms.Resize((224, 224)),
+            transforms.RandAugment(),
+            transforms.RandomPerspective(distortion_scale=0.5, p=0.5),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2),
+            transforms.RandomApply([transforms.GaussianBlur(5)], p=0.3),
+            # transforms.RandomResizedCrop(224),
+            # transforms.RandomHorizontalFlip(),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+        'val': transforms.Compose([
+            # transforms.Resize((224, 224)),
 
-# Iterate through the files and rename them if they contain "#"
-for file in files:
-    if "#" in file:
-        new_file = file.replace("#", "")
-        os.rename(os.path.join(folder_path, file), os.path.join(folder_path, new_file))
+            # transforms.Resize(256),
+            # transforms.CenterCrop(224),
+            transforms.ToTensor(),
+            transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+        ]),
+    }
 
-print('end')
+img = Image.open(r"C:\Code\ML\Image\card_cls\train_data4_224\train\1 Kevin Durant\6YQAAOSwfvZjbZOm.jpg")
+print(img.size)

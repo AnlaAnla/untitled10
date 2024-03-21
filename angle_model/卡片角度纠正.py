@@ -23,7 +23,7 @@ def correct_angle(img_path):
     # gray = cv2.GaussianBlur(gray, (7, 7), 1)
 
     # 应用Canny边缘检测
-    edges = cv2.Canny(gray, 50, 150)
+    edges = cv2.Canny(gray, 100, 200)
 
     # 寻找轮廓
     contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -60,7 +60,7 @@ def correct_angle(img_path):
     plt.axis('off')
 
     plt.subplot(131)
-    plt.imshow(cv2.cvtColor(edges, cv2.COLOR_BGR2RGBA))
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGBA))
     plt.title('img')
 
     plt.subplot(132)
