@@ -35,9 +35,9 @@ def write_angle(dir_path, save_dir):
 
 
 
-dir_path = r'C:\Code\ML\Image\angle_data\test\label'
+# dir_path = r'C:\Code\ML\Image\angle_data\test\label'
 # flip_img(dir_path)
-left2right(dir_path)
+# left2right(dir_path)
 
-# write_angle(r"C:\Code\ML\Image\angle_data\test\img",
-#             r"C:\Code\ML\Image\angle_data\test\label")
+write_angle(r"C:\Code\ML\Image\angle_data\test\img",
+            r"C:\Code\ML\Image\angle_data\test\label")

@@ -18,12 +18,13 @@ def correct_angle(img_path):
 
     # 转换为灰度图像
     gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-    _, binary = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+    _, binary = cv2.threshold(gray, 15, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     # 使用自适应阈值进行预处理
-    # gray = cv2.GaussianBlur(gray, (7, 7), 1)
+    gray = cv2.GaussianBlur(gray, ksize=(0, 0), sigmaX=2)
+
 
     # 应用Canny边缘检测
-    edges = cv2.Canny(gray, 50, 150)
+    edges = cv2.Canny(gray, 30, 70)
 
     # 寻找轮廓
     contours, _ = cv2.findContours(edges, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)
@@ -60,7 +61,7 @@ def correct_angle(img_path):
     plt.axis('off')
 
     plt.subplot(131)
-    plt.imshow(cv2.cvtColor(edges, cv2.COLOR_BGR2RGBA))
+    plt.imshow(cv2.cvtColor(img, cv2.COLOR_BGR2RGBA))
     plt.title('img')
 
     plt.subplot(132)
@@ -102,7 +103,7 @@ if __name__ == '__main__':
     model = torch.load(r"C:\Code\ML\Model\angle_model04.pt")
     model.eval()
 
-    dir_path = r'C:\Code\ML\Image\angle_data\test\img'
+    dir_path = r"C:\Code\ML\Image\angle_data\test\img"
     for img_name in os.listdir(dir_path):
         img_path = os.path.join(dir_path, img_name)
         correct_angle(os.path.join(dir_path, img_path))

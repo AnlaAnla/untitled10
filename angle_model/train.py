@@ -16,6 +16,7 @@ class AngleDataset(Dataset):
         self.angles = angles
         self.transform = transforms.Compose([
             transforms.Resize((32, 32)),
+            transforms.ColorJitter(brightness=0.2, contrast=0.2, saturation=0.2),
             transforms.ToTensor(),
             transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5))
         ])
@@ -28,6 +29,7 @@ class AngleDataset(Dataset):
         angle = self.angles[idx]
         image = self.transform(image)
         return image, float(angle)
+
 
 def load_data(data_dir):
     images = []
@@ -63,7 +65,8 @@ if __name__ == '__main__':
 
     # model = AngleNet()
     # model.load_state_dict(torch.load('angle_model03.pth'))
-    model = torch.load('angle_model04.pt')
+    # model = torch.load(r"C:\Code\ML\Model\angle_model\script_angle04.pt")
+    model = torch.jit.load(r'C:\Code\ML\Model\angle_model\script_angle_model06.pt')
 
     # print(model)
     # 创建数据集和数据加载器
@@ -71,10 +74,10 @@ if __name__ == '__main__':
     dataloader = DataLoader(dataset, batch_size=4, shuffle=True)
 
     criterion = nn.MSELoss()
-    optimizer = optim.Adam(model.parameters(), lr=0.002)
+    optimizer = optim.Adam(model.parameters(), lr=0.001)
 
     # 训练epochs
-    num_epochs = 40
+    num_epochs = 20
     for epoch in range(num_epochs):
         running_loss = 0.0
         for inputs, labels in dataloader:
@@ -97,5 +100,7 @@ if __name__ == '__main__':
 
     # 保存模型
     # torch.save(model.state_dict(), 'angle_model03.pth')
-    torch.save(model, 'angle_model04.pt')
-
+    model.eval()
+    model = torch.jit.script(model)
+    torch.jit.save(model, os.path.join(r'C:\Code\ML\Model\angle_model', 'script_angle_model06.pt'))
+    # torch.save(model, os.path.join(r'C:\Code\ML\Model\angle_model', 'script_angle_model06.pt'))
