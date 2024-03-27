@@ -67,7 +67,6 @@ def judge_clear(card_img):
 
 model = YOLO('C:\Code\ML\RemoteProject\yolov8_test\model\yolo_card02.pt')
 cap = cv2.VideoCapture(0)
-card_temp_id = []
 
 while cap.isOpened():
     # Read a frame from the video

@@ -1,7 +1,7 @@
 import requests
 
 def send_img(img_path):
-    files = {'file': open(img_path, 'rb')}
+    files = {'imgFile': open(img_path, 'rb')}
 
     response = requests.post(url, files=files)
 
@@ -13,7 +13,7 @@ def send_img(img_path):
         print(f'文件上传失败, 错误代码: {response.status_code}')
 
 if __name__ == '__main__':
-    url = "http://192.168.56.116:8000/upload/"
+    url = "http://192.168.56.116:8088/image/"
 
     img_path = r"C:\Code\ML\Image\test02\1 (5).jpg"
     send_img(img_path)
