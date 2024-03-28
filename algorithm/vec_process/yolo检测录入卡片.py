@@ -12,9 +12,27 @@ import numpy as np
 def vec_distance(vec1, vec2):
     return np.linalg.norm(vec1 - vec2)
 
+# 判断图像清晰度
+def judge_clear(card_img):
+    gray = cv2.cvtColor(card_img, cv2.COLOR_BGR2GRAY)
+    # 计算拉普拉斯算子的方差, 判断图像的模糊程度
+    fm = cv2.Laplacian(gray, cv2.CV_64F).var()
+    print(f'卡片图像 拉普拉斯算子的方差: {fm}', end=' \t')
+    if fm > 500:
+        print(" --------------- 图片清晰")
+        return True
+    else:
+        print("XXXXXX 图片模糊")
+        return False
+
 # 将图片转化为向量, 并与已经储存的向量进行对比
 def add_img2vector(img):
     input_array = onnxYolo.get_max_box(img)
+
+    # 拒绝不清晰的特征图像
+    if not judge_clear(input_array):
+        return False
+
     output = onnxModel.run(input_array)
 
     global img_id, vec_data, name_list, temp_array
@@ -26,15 +44,15 @@ def add_img2vector(img):
 
     print('_'*20)
     print(min_dis)
-    if min_dis > 15:
+    if min_dis > 13:
         img_id += 1
         name_list.append(img_id)
         vec_data = np.concatenate([vec_data, output], axis=0)
 
-        temp_array = input_array
+        temp_array = onnxYolo_card.get_max_box(img)
         print('yes: ', img_id)
         return False
-    print("No!: ", img_id)
+    print("No!: ", img_id, '\t重复id:', name_list[np.argmin(distances)])
     return True
 
 
@@ -45,6 +63,7 @@ if __name__ == '__main__':
 
     onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card03.onnx")
     onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolov8n.onnx")
+    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card02.onnx")
 
     temp_array = np.random.rand(300, 300, 3)
     vec_data = onnxModel.run(background_img_path)

@@ -1,9 +1,30 @@
-import os
+import numpy as np
+from transformers import pipeline
+from PIL import Image
+import cv2
 
-dir_path = r"C:\Code\ML\Image\test02"
+# load pipe
+pipe = pipeline(task="depth-estimation", model=r"C:\Code\ML\Model\huggingface\depth-anything-small-hf")
 
+def show(img_path):
+    img = Image.open(img_path)
+    depth = pipe(img)['depth']
+    depth.show()
 
-for i, filename in enumerate(os.listdir(dir_path)):
-    img_path = os.path.join(dir_path, filename)
-    new_path = os.path.join(dir_path, 'a' + str(i) + ".jpg")
-    os.rename(img_path, new_path)
+cap = cv2.VideoCapture(0)
+
+while cap.isOpened():
+    ret, frame = cap.read()
+    if ret:
+        frame = Image.fromarray(frame)
+        depth = pipe(frame)['depth']
+        depth = np.array(depth)
+        cv2.imshow('frame', depth)
+
+        if cv2.waitKey(1) & 0xFF == ord('q'):
+            break
+    else:
+        print('not ret')
+
+cap.release()
+cv2.destroyAllWindows()
