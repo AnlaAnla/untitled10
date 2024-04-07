@@ -1,30 +1,13 @@
-import numpy as np
-from transformers import pipeline
-from PIL import Image
-import cv2
+import os
+import shutil
 
-# load pipe
-pipe = pipeline(task="depth-estimation", model=r"C:\Code\ML\Model\huggingface\depth-anything-small-hf")
+father_dir_path = r'C:\Code\ML\Image\card_cls\train_pokemon01_224\train'
 
-def show(img_path):
-    img = Image.open(img_path)
-    depth = pipe(img)['depth']
-    depth.show()
+for i, dir_name in enumerate(os.listdir(father_dir_path)):
+    dir_path = os.path.join(father_dir_path, dir_name)
 
-cap = cv2.VideoCapture(0)
+    new_dir_name = 'pokemon_' + str(i)
+    new_dir_path = os.path.join(father_dir_path, new_dir_name)
 
-while cap.isOpened():
-    ret, frame = cap.read()
-    if ret:
-        frame = Image.fromarray(frame)
-        depth = pipe(frame)['depth']
-        depth = np.array(depth)
-        cv2.imshow('frame', depth)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            break
-    else:
-        print('not ret')
-
-cap.release()
-cv2.destroyAllWindows()
+    os.renames(dir_path, new_dir_path)
+print('end')

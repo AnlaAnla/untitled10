@@ -1,0 +1,5 @@
+path:
+  onnxModel_path: ./Model/model_features_card03.onnx
+  onnxYolo_path : ./Model/yolov8n.onnx
+  onnxYolo_card_path: ./Model/yolo_card02.onnx
+  output_dir: ./temp

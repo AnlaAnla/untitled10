@@ -3,11 +3,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import cv2
 
-cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
+onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+img_path = r"C:\Code\ML\Image\test02\22 (4).jpg"
 
-onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolov8n.onnx")
-img_path = r"C:\Code\ML\Image\test02\a9.jpg"
-
-img = onnxYolo.get_max_box(img_path)
-
-print()
+img = onnxYolo.set_result(img_path)
+results = onnxYolo.results
+results[0].show()

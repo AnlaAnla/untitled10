@@ -2,7 +2,7 @@ import cv2
 from ultralytics import YOLO
 
 
-model = YOLO('C:\Code\ML\RemoteProject\yolov8_test\model\yolo_card02.pt')
+model = YOLO('C:\Code\ML\RemoteProject\yolov8_test\model\yolo_card03.pt')
 
 video_path = r"C:\Code\ML\Video\2024_03_07 16_20_42.mp4"
 save_path = r"C:\Code\ML\Video\temp\output3.mp4"
