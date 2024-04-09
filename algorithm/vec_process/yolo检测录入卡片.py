@@ -3,7 +3,7 @@ import time
 
 import cv2
 
-from MyOnnxModel import MyOnnxModel
+from MyOnnxModel_MobileNetV3 import MyOnnxModel
 from MyOnnxYolo import MyOnnxYolo
 import numpy as np
 
@@ -48,7 +48,7 @@ def add_img2vector(img):
 
     print('_' * 20)
     print(min_dis)
-    if min_dis > 13:
+    if min_dis > 11:
         img_id += 1
         name_list.append(img_id)
         vec_data = np.concatenate([vec_data, output], axis=0)
@@ -62,9 +62,7 @@ def add_img2vector(img):
 
 if __name__ == '__main__':
 
-    img_dir = r"C:\Code\ML\Image\test02"
-
-    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card04.onnx")
+    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card06.onnx")
     onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
 
     temp_array = np.random.rand(300, 300, 3)
@@ -98,11 +96,3 @@ if __name__ == '__main__':
 
     cap.release()
     cv2.destroyAllWindows()
-
-    # dir_path = r'C:\Code\ML\Image\card_cls\one_piece'
-    # for img_name in os.listdir(dir_path):
-    #     img_path = os.path.join(dir_path, img_name)
-    #     print(img_name)
-    #     add_img2vector(img_path)
-    #     print('='*45)
-    # print('end')

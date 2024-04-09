@@ -5,7 +5,7 @@ import os
 
 
 # 路径不可有中文,size_threshold: 长或宽大于该值，压缩图片，否之跳过
-def compress_img(src_path, dst_path, size_threshold=1000):
+def compress_img(src_path, dst_path, size_threshold=900):
     # 当前目录读取一张图片（499Kb，1920*1080）
     img = cv.imread(src_path)
 
@@ -14,17 +14,15 @@ def compress_img(src_path, dst_path, size_threshold=1000):
         img = cv.resize(img, (0, 0), fx=0.5, fy=0.5, interpolation=cv.INTER_CUBIC)
 
         # 压缩图片（226Kb）
-        # cv.imwrite(dst_path, img, [cv.IMWRITE_JPEG_QUALITY, 80])
+        cv.imwrite(dst_path, img, [cv.IMWRITE_JPEG_QUALITY, 80])
         cv.imwrite(dst_path, img)
         print(dst_path)
 
 
-dir_path = r"D:\Code\ML\images\Mywork3\card_database\prizm\21-22"
+father_dir = r'C:\Code\ML\Image\card_cls\train_data6_224\train'
 
-for name01 in os.listdir(dir_path):
-    for name02 in os.listdir(os.path.join(dir_path, name01)):
-        source_path = os.path.join(dir_path, name01, name02)
-        # print(source_path)
-        compress_img(source_path, source_path)
-
+for dir_name in os.listdir(father_dir):
+    for img_dir_name in os.listdir(os.path.join(father_dir, dir_name)):
+        img_path = os.path.join(father_dir, dir_name, img_dir_name)
+        compress_img(img_path, img_path)
 print('end')

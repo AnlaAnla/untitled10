@@ -8,6 +8,7 @@ import numpy as np
 # 假设你已经加载了PyTorch模型
 
 
+# 直接放要转换的模型
 def model2onnx(model, output_path):
     # 设置模型为评估模式
     model.eval()
@@ -21,7 +22,7 @@ def model2onnx(model, output_path):
     output_names = ["output"]
 
     # 导出 model.features 部分
-    torch.onnx.export(model.features, dummy_input, output_path, input_names=input_names, output_names=output_names)
+    torch.onnx.export(model, dummy_input, output_path, input_names=input_names, output_names=output_names)
 
 
 def onnx_run(onnx_file_path):
@@ -39,8 +40,22 @@ def onnx_run(onnx_file_path):
     print(f"Output shape: {output.shape}")
 
 if __name__ == '__main__':
-    model = models.mobilenet_v3_large(pretrained=False)
-    # 修改最后一层
-    model.classifier[-1] = torch.nn.Linear(in_features=1280, out_features=1727, bias=True)
-    model.load_state_dict(torch.load(r"C:\Code\ML\Model\mobilenetv3_out1727_card04.pth", map_location='cpu'))
-    model2onnx(model, r"C:\Code\ML\Model\onnx\model_features_card04.onnx")
+    # model = models.mobilenet_v3_large(pretrained=False)
+    # # 修改最后一层
+    # model.classifier[-1] = torch.nn.Linear(in_features=1280, out_features=1727, bias=True)
+    # model.load_state_dict(torch.load(r"C:\Code\ML\Model\mobilenetv3_out1727_card06.pth", map_location='cpu'))
+    # model2onnx(model.features, r"C:\Code\ML\Model\onnx\model_features_card06.onnx")
+
+    # resnet50
+    model = models.resnet50(pretrained=False)
+
+
+    num_in_feature = model.fc.in_features
+    model.fc = torch.nn.Linear(num_in_feature, 1727)
+    model.load_state_dict(torch.load(r"C:\Code\ML\Model\resent_out1727_card06.pth", map_location=torch.device('cpu')))
+
+    features = list(model.children())[:-1] # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
+    model = torch.nn.Sequential(*features)
+
+    model2onnx(model, r"C:\Code\ML\Model\onnx\resent50_feature_card06.onnx")
+    print('end')

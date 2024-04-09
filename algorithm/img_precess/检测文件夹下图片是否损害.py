@@ -4,7 +4,7 @@ import time
 import PIL.Image as Image
 from multiprocessing.pool import ThreadPool
 
-img_paths = glob.glob(r"C:\Code\ML\Image\card_cls\train_data_allcard\*\*")
+img_paths = glob.glob(r"C:\Code\ML\Image\card_cls\train_data6\train\*\*")
 num = 0
 bad_num = 0
 
@@ -12,6 +12,10 @@ bad_num = 0
 def check(img_path):
     global num
     global bad_num
+
+    if num < 31667:
+        num += 1
+        return
     try:
         img = Image.open(img_path)
         img.load()
@@ -34,13 +38,13 @@ def check(img_path):
 if __name__ == '__main__':
 
     t1 = time.time()
-    pool = ThreadPool(4)
-    pool.map(check, img_paths)
-    pool.close()
-    pool.join()
+    # pool = ThreadPool(4)
+    # pool.map(check, img_paths)
+    # pool.close()
+    # pool.join()
 
-    # for path in img_paths:
-    #     check(path)
+    for path in img_paths:
+        check(path)
 
     t2 = time.time()
     print('===========', num, '  time：', (t2 - t1), ' bad_num: ', bad_num)

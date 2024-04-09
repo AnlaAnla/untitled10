@@ -1,13 +1,11 @@
 import os
-import shutil
 
-father_dir_path = r'C:\Code\ML\Image\card_cls\train_pokemon01_224\train'
+father_dir = r'C:\Code\ML\Image\card_cls\train_data6\train'
 
-for i, dir_name in enumerate(os.listdir(father_dir_path)):
-    dir_path = os.path.join(father_dir_path, dir_name)
+for dir_name in os.listdir(father_dir):
+    dir_path = os.path.join(father_dir, dir_name)
+    num = len(os.listdir(dir_path))
 
-    new_dir_name = 'pokemon_' + str(i)
-    new_dir_path = os.path.join(father_dir_path, new_dir_name)
-
-    os.renames(dir_path, new_dir_path)
+    if num < 1:
+        print(dir_name, 'has less than 3 images -- ', num)
 print('end')
