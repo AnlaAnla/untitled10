@@ -9,7 +9,7 @@ from algorithm.vec_process.MyOnnxYolo import MyOnnxYolo
 
 
 if __name__ == '__main__':
-    model = MyOnnxYolo(r"C:\Code\ML\Model\yolo_card03.pt")
+    model = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
 
     train_dir = r"C:\Code\ML\Image\card_cls\train_data6_224\train"
 

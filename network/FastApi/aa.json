@@ -1,0 +1,17 @@
+{
+  "model_name": "resnet50",
+  "data_dir_path": "/media/martin/DATA/_ML/Image/card_cls/train_data7_224",
+
+  "load_my_model": false,
+  "model_path": "/media/martin/DATA/_ML/Model/resent_out17355_AllCard07.pth",
+
+  "is_transfer_learn": false,
+  "transfer_cls": 12796,
+
+  "params":{
+    "epoch": 30,
+    "learn_rate": 0.01,
+    "momentum": 0.9,
+    "decay": 0.7
+  }
+}

@@ -63,7 +63,7 @@ def add_img2vector(img):
 if __name__ == '__main__':
 
     onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card06.onnx")
-    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
 
     temp_array = np.random.rand(300, 300, 3)
     # vec_data = onnxModel.run(background_img_path)

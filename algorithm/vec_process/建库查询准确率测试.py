@@ -35,7 +35,7 @@ def search_img2vector(img_path: str):
 
 
 if __name__ == '__main__':
-    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\resent50_feature_card06.onnx")
+    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\resent_out17355_AllCard08.onnx")
     # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
 
     vec_data = np.zeros((1, 2048))

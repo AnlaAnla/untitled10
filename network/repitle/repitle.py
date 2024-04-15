@@ -21,13 +21,13 @@ def get_content(url):
     return content
 
 
-def get_imgUrls(url, num=189):
+def get_imgUrls(url):
     img_urlList = []
 
     info = get_content(url)
     # print (info)
     soup = BeautifulSoup(info, 'html.parser')  # 设置解析器为“lxml”
-
+    num = 0
     # 读取页面一的网址，为了获得大尺寸图片
     for i in range(1, num + 1):
         try:
@@ -53,34 +53,30 @@ def download_img(img_url, save_path):
         print(save_path, ": fault")
 
 
-def download_yearImg_thread(year, num, num_processes=4):
-
-    year_dir = os.path.join(save_dir, year)
-    # 年份文件夹是否存在，不存在则创建
-    if not os.path.exists(year_dir):
-        os.makedirs(year_dir)
+def download_yearImg():
 
     # 获取图片url列表
-    url = "https://www.ebay.com/sch/i.html?_from=R40&_trksid=p2334524.m570.l1313&_nkw=20{}+Optic&_sacat=0&LH_TitleDesc=0&_odkw=2019-20+Optic&_osacat=0&_ipg=240".format(year)
+    url = "https://onepiece-cardgame.dev/cards?f=%24R+%28col%3A%22%2F%22%29"
     print("download ", url)
 
-    img_urlList = get_imgUrls(url=url, num=num)
+    img_urlList = get_imgUrls(url=url)
     print(len(img_urlList))
 
-    # 线程池
-    pool = ThreadPool(processes=num_processes)
 
-    for i in range(len(img_urlList)):
-        img_name = str(i) + ".jpg"
-        save_path = os.path.join(year_dir, img_name)
-        img_url = img_urlList[i]
 
-        pool.apply_async(func=download_img, args=(img_url, save_path))
-        # download_img(img_url, save_path)
-        print('save: ', i, ' ', img_name)
+    # for i in range(len(img_urlList)):
+    #     img_name = str(i) + ".jpg"
+    #     save_path = os.path.join(year_dir, img_name)
+    #     img_url = img_urlList[i]
+    #
+    #     pool.apply_async(func=download_img, args=(img_url, save_path))
+    #     # download_img(img_url, save_path)
+    #     print('save: ', i, ' ', img_name)
 
 
 if __name__ == '__main__':
-    for year in down_years:
-        download_yearImg_thread(year, num=200, num_processes=8)
-        print('end')
+    # download_yearImg()
+
+    content = get_content("https://onepiece-cardgame.dev/cards?f=%24R+%28col%3A%22%2F%22%29")
+    soup = BeautifulSoup(content, 'html.parser')
+    print(content)

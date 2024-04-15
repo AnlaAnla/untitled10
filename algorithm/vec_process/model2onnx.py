@@ -39,6 +39,7 @@ def onnx_run(onnx_file_path):
     output = onnx_outputs[0]
     print(f"Output shape: {output.shape}")
 
+
 if __name__ == '__main__':
     # model = models.mobilenet_v3_large(pretrained=False)
     # # 修改最后一层
@@ -49,13 +50,12 @@ if __name__ == '__main__':
     # resnet50
     model = models.resnet50(pretrained=False)
 
-
     num_in_feature = model.fc.in_features
-    model.fc = torch.nn.Linear(num_in_feature, 1727)
-    model.load_state_dict(torch.load(r"C:\Code\ML\Model\resent_out1727_card06.pth", map_location=torch.device('cpu')))
+    model.fc = torch.nn.Linear(num_in_feature, 17355)
+    model.load_state_dict(torch.load(r"C:\Code\ML\Model\resent_out17355_AllCard08.pth", map_location=torch.device('cpu')))
 
-    features = list(model.children())[:-1] # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
+    features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
     model = torch.nn.Sequential(*features)
 
-    model2onnx(model, r"C:\Code\ML\Model\onnx\resent50_feature_card06.onnx")
+    model2onnx(model, r"C:\Code\ML\Model\resent_out17355_AllCard08.onnx")
     print('end')
