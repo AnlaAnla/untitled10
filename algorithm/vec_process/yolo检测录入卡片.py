@@ -26,16 +26,26 @@ def judge_clear(card_img):
         print("XXXXXX 图片模糊")
         return False
 
+def judge_hands():
+    if onnxYolo.check(cls_id=2):
+        print("hand: 检测到了手")
+        return True
+    return False
+
 
 # 将图片转化为向量, 并与已经储存的向量进行对比
 def add_img2vector(img):
     global img_id, vec_data, name_list, temp_array, frame
 
-    onnxYolo_card.set_result(img)
-    input_array = onnxYolo_card.get_max_img(cls_id=0)
-    frame = onnxYolo_card.results[0].plot()
+    onnxYolo.set_result(img)
+    if not onnxYolo.check(cls_id=0):
+        print('没有检测到卡片')
+        return False
+
+    input_array = onnxYolo.get_max_img(cls_id=0)
+    frame = onnxYolo.results[0].plot()
     # 拒绝不清晰的特征图像
-    if not judge_clear(input_array):
+    if not judge_clear(input_array) and judge_hands():
         return False
 
     output = onnxModel.run(input_array)
@@ -63,7 +73,7 @@ def add_img2vector(img):
 if __name__ == '__main__':
 
     onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card06.onnx")
-    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
+    onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
 
     temp_array = np.random.rand(300, 300, 3)
     # vec_data = onnxModel.run(background_img_path)

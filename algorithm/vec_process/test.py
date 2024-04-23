@@ -33,6 +33,7 @@ def add_img2vector(img, img_name):
     print("No!: ", img_id, '\t重复id:', name_list[np.argmin(distances)])
     return True
 
+
 def search_img2vector(img):
     global img_id, vec_data, name_list
     onnxYolo_card.set_result(img)
@@ -48,26 +49,26 @@ def search_img2vector(img):
     print(search_name, ': ', min_dis)
     return search_name
 
+
 if __name__ == '__main__':
-    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\model_features_card06onnx")
-    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\mobilenetv3_features_AllCard09.onnx")
+    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
 
     vec_data = np.zeros((1, 960))
     name_list = ['background']
 
     img_id = 0
 
-
-    data_dir = r'C:\Code\ML\Image\OBJDetected\dataset_test'
+    data_dir = r'C:\Code\ML\Image\Card_test\OBJDetected\dataset poke-op'
     for img_dir_name in os.listdir(data_dir):
         for img_name in os.listdir(os.path.join(data_dir, img_dir_name)):
-            img_path = os.path.join(data_dir, img_dir_name,img_name)
+            img_path = os.path.join(data_dir, img_dir_name, img_name)
             add_img2vector(img_path, img_dir_name)
     print('end')
 
     total_num = 0
     yes_num = 0
-    val_dir = r"C:\Code\ML\Image\OBJDetected\val"
+    val_dir = r"C:\Code\ML\Image\Card_test\OBJDetected\val"
     for img_dir_name in os.listdir(val_dir):
         for img_name in os.listdir(os.path.join(val_dir, img_dir_name)):
             img_path = os.path.join(val_dir, img_dir_name, img_name)
@@ -75,13 +76,13 @@ if __name__ == '__main__':
             search_name = search_img2vector(img_path)
 
             total_num += 1
-            if search_name == img_dir_name:
+            if img_dir_name in search_name:
                 yes_num += 1
             else:
                 print('❌')
 
-            print('=='*20)
+            print('==' * 20)
 
     print('total_num:', total_num)
     print('yes_num:', yes_num)
-    print(yes_num/total_num)
+    print(yes_num / total_num)

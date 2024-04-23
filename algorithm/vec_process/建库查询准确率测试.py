@@ -1,6 +1,7 @@
 import os
 
-from MyOnnxModel_Resnet50 import MyOnnxModel
+# from MyOnnxModel_Resnet50 import MyOnnxModel
+from MyOnnxModel_MobileNetV3 import MyOnnxModel
 from MyOnnxYolo import MyOnnxYolo
 import numpy as np
 
@@ -35,10 +36,13 @@ def search_img2vector(img_path: str):
 
 
 if __name__ == '__main__':
-    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\resent_out17355_AllCard08.onnx")
-    # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\mobilenetv3_features_AllCard09.onnx")
+    vec_data = np.zeros((1, 960))
 
-    vec_data = np.zeros((1, 2048))
+    # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+    # vec_data = np.zeros((1, 2048))
+
+
     name_list = ['background']
 
     img_id = 0

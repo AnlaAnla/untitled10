@@ -11,7 +11,7 @@ for i in range(1000):
     loss = data - i
     print(data)
     writer.add_scalar('data', data, i)
-    writer.add_scalar('data', loss, i)
+    writer.add_scalar('mmmm', loss, i)
 
 writer.flush()
 writer.close()

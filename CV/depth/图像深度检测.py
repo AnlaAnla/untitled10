@@ -6,6 +6,7 @@ import cv2
 # load pipe
 pipe = pipeline(task="depth-estimation", model=r"C:\Code\ML\Model\huggingface\depth-anything-small-hf")
 
+
 def show(img_path):
     img = Image.open(img_path)
     depth = pipe(img)['depth']

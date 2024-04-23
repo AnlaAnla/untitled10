@@ -1,9 +1,9 @@
 {
   "model_name": "resnet50",
-  "data_dir_path": "/media/martin/DATA/_ML/Image/card_cls/train_data7_224",
+  "data_name": "train_test",
 
   "load_my_model": false,
-  "model_path": "/media/martin/DATA/_ML/Model/resent_out17355_AllCard07.pth",
+  "model_path": "",
 
   "is_transfer_learn": false,
   "transfer_cls": 12796,
