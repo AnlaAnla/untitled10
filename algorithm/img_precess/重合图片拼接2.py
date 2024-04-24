@@ -242,11 +242,11 @@ if __name__ == "__main__":
     path4 = r"C:\Code\ML\Image\Card_test\test\rect4.jpg"
 
     res1 = main_process(path1, path2, direction=0)
-    # res2 = main_process(path3, path4, direction=0)
+    res2 = main_process(path3, path4, direction=0)
+
+    res3 = main_process(res1, res2, direction=1)
     #
-    # res3 = main_process(res1, res2, direction=1)
-    #
-    # cv2.imwrite('result1.jpg', res1)
-    # cv2.imwrite('result2.jpg', res2)
-    # cv2.imwrite('result3.jpg', res3)
+    cv2.imwrite('result1.jpg', res1)
+    cv2.imwrite('result2.jpg', res2)
+    cv2.imwrite('result3.jpg', res3)
 

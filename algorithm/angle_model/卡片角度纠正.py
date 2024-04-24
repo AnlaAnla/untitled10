@@ -108,11 +108,11 @@ if __name__ == '__main__':
     model = torch.jit.load(r"C:\Code\ML\Model\angle_model\script_angle_model06.pt")
     model.eval()
 
-    dir_path = r'C:\Code\ML\Image\angle_data\test\img'
-    for img_name in os.listdir(dir_path):
-        img_path = os.path.join(dir_path, img_name)
-        correct_angle(os.path.join(dir_path, img_path))
-    # correct_angle(r"C:\Code\ML\Image\angle_data\test\img\22_2 (14).jpg")
+    # dir_path = r'C:\Code\ML\Image\angle_data\test\img'
+    # for img_name in os.listdir(dir_path):
+    #     img_path = os.path.join(dir_path, img_name)
+    #     correct_angle(os.path.join(dir_path, img_path))
+    correct_angle(r"C:\Code\ML\Image\Card_test\test02\23.jpg")
 
     # img = cv2.imread(p[1])
     # img = cv2.resize(img, (32, 32))
