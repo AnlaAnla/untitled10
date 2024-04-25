@@ -1,17 +1,35 @@
 import os
-
+import time
+import cv2
 from MyOnnxYolo import MyOnnxYolo
 
 if __name__ == '__main__':
-    onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
+    onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01_simple.onnx")
 
-    data_dir = r"C:\Code\ML\Image\Card_test\test03"
+    t1 = time.time()
+    img = cv2.imread(r"C:\Code\ML\Image\Card_test\test02\a3.jpg")
+    img = cv2.resize(img, (img.shape[0]//4, img.shape[1]//4))
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+ 
+    t2 = time.time()
+    onnxYolo.set_result(img)
 
-    for img_name in os.listdir(data_dir):
-        img_path = os.path.join(data_dir, img_name)
-        onnxYolo.set_result(img_path)
-        results = onnxYolo.results
+    t3 = time.time()
+    onnxYolo.set_result(img)
 
-        results[0].show()
+    t4 = time.time()
+    onnxYolo.set_result(img)
 
-    print('end')
+    t5 = time.time()
+    img = cv2.imread(r"C:\Code\ML\Image\Card_test\test02\a5.jpg")
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    t6 = time.time()
+    onnxYolo.set_result(img)
+
+    print(f'读取图片: {t2 - t1}s')
+    print(f'yolo检测: {t3 - t2}s')
+    print(f'yolo检测: {t4 - t3}s')
+    print(f'yolo检测: {t5 - t4}s')
+
+    print(f'yolo检测: {time.time() - t6}s')
