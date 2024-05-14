@@ -12,6 +12,7 @@ def show(img_path):
     depth = pipe(img)['depth']
     depth.show()
 
+
 cap = cv2.VideoCapture(0)
 
 while cap.isOpened():

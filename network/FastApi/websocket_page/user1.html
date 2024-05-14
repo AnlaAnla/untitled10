@@ -1,49 +1,21 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
-    <meta charset="UTF-8">
-    <title>聊天1</title>
+    <title>Changing Value</title>
 </head>
+
 <body>
-<h1>User1 Chat</h1>
-<form action="" onsubmit="sendMessage(event)">
-    用户名称:<input type="text" id="userName"/>
-    <button onclick="creat()">创建用户</button>
-    <br>
-    <hr>
-    <br>
-    <input type="text" id="messageText" autocomplete="off"/>
-    <button>Send</button>
-</form>
-<ul id='messages'>
-</ul>
+    <h1>Changing Value: <span id="value">0</span></h1>
 
-<script>
+    <script>
+        const valueSpan = document.getElementById('value');
+        const socket = new WebSocket('ws://localhost:8000/ws');
 
-    var ws;
-
-    // function creat() {
-    //
-    // }
-    var userName = document.getElementById("userName")
-    console.log('creat')
-    ws = new WebSocket("ws://127.0.0.1:8010/ws/user1");
-
-    ws.onmessage = function (event) {
-        var messages = document.getElementById('messages')
-        var message = document.createElement('li')
-        var content = document.createTextNode(event.data)
-        message.appendChild(content)
-        messages.appendChild(message)
-        messages.appendChild(document.createElement('hr'))
-    };
-    function sendMessage(event) {
-        var input = document.getElementById("messageText")
-        ws.send(input.value)
-        input.value = ''
-        event.preventDefault()
-    }
-</script>
-
+        socket.onmessage = function (event) {
+            valueSpan.textContent = event.data;
+        };
+    </script>
 </body>
+
 </html>

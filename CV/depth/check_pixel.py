@@ -5,7 +5,7 @@ from transformers import pipeline
 import PIL.Image as Image
 
 # 读取深度图像
-depth_image = cv2.imread(r"C:\Code\ML\Image\test02\22 (6).jpg", cv2.IMREAD_ANYDEPTH)
+depth_image = cv2.imread(r"C:\Users\wow38\Pictures\Screenshots\map1.png", cv2.IMREAD_ANYDEPTH)
 
 # 创建一个matplotlib图像
 fig, ax = plt.subplots(figsize=(10, 6))

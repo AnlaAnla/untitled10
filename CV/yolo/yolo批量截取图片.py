@@ -1,11 +1,10 @@
 import os
 import PIL.Image as Image
-import matplotlib.pyplot as plt
 import cv2
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from algorithm.vec_process.MyOnnxYolo import MyOnnxYolo
+from CV.vec_process.MyOnnxYolo import MyOnnxYolo
 
 
 if __name__ == '__main__':

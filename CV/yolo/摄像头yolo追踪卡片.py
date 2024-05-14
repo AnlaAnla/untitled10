@@ -65,7 +65,7 @@ def judge_clear(card_img):
         return False
 
 
-model = YOLO(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
+model = YOLO(r"C:\Code\ML\Model\Card_cls\yolo_handcard02_imgsz128.pt")
 cap = cv2.VideoCapture(0)
 
 while cap.isOpened():

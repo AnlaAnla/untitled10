@@ -2,8 +2,8 @@ import os
 
 import cv2
 
-def flip_img(dir_path):
 
+def flip_img(dir_path):
     for filename in os.listdir(dir_path):
         if 'r' in filename:
             img_path = os.path.join(dir_path, filename)
@@ -11,6 +11,7 @@ def flip_img(dir_path):
             img = cv2.flip(img, 1)
             cv2.imwrite(img_path, img)
     print('flip end')
+
 
 def left2right(dir_path):
     for filename in os.listdir(dir_path):
@@ -26,13 +27,13 @@ def left2right(dir_path):
             print(save_name, angle)
     print('left2right end')
 
+
 def write_angle(dir_path, save_dir):
     for filename in os.listdir(dir_path):
         save_path = os.path.join(save_dir, filename.replace('jpg', 'txt'))
         with open(save_path, 'w', encoding='utf-8') as f:
             angle = input(filename + "Enter angle: ")
             f.write(angle)
-
 
 
 # dir_path = r'C:\Code\ML\Image\angle_data\test\label'

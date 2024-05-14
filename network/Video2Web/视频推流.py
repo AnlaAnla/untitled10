@@ -44,6 +44,11 @@ def generate_frames():
         frame = video_stream_handler.get_frame()
         if frame is None:
             continue
+
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # 转化为灰度图
+        ret, frame = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)  # 阈值二值化
+
+
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'

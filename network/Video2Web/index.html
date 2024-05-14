@@ -1,6 +1,82 @@
 <!DOCTYPE html>
-<html>
+<html lang="cn">
+
+<head>
+    <meta charset="UTF-8">
+    <title>推流测试</title>
+    
+</head>
+
 <body>
-    <img src="http://localhost:8000/video_feed" autoplay>
+    <!--    <img src="http://localhost:8000/video_feed" autoplay>-->
+    <div id="video_div">
+        <img id="video" src="http://192.168.56.117:8000/video_feed" autoplay>
+    </div>
+    <br>
+
+    <button id="photo">拍照</button>
+    <br>
+    <button id="start_video">开始推流</button>
+    <button id="stop_video">停止推流</button>
+    <br>
+    <hr>
+    <img id="capturedImage">
+
+
 </body>
+
+<script>
+    
+    const video_div = document.getElementById('video_div');
+
+    const photo = document.getElementById('photo');
+
+    const start_video = document.getElementById('start_video');
+    const stop_video = document.getElementById('stop_video');
+    const capturedImage = document.getElementById('capturedImage');
+
+
+
+    photo.addEventListener('click', async () => {
+        try {
+            const response = await fetch('http://192.168.56.117:8000/capture_image');
+            const blob = await response.blob();
+            const imageUrl = URL.createObjectURL(blob);
+            // 在这里处理捕获的图像,例如显示在 img 标签中
+            capturedImage.src = imageUrl;
+        } catch (error) {
+            console.error('Error capturing image:', error);
+        }
+    });
+
+    start_video.onclick = function(){
+        const video = document.getElementById('video');
+        if (video) {
+            video_div.removeChild(videoImg);
+        }else{
+            console.log('缺失推流图片');
+        }
+        const newVideoImg = document.createElement('img');
+        newVideoImg.id = 'video';
+        newVideoImg.autoplay = true;
+
+        // 添加新的子元素
+        video_div.appendChild(newVideoImg);
+    }
+
+    stop_video.addEventListener('click', async () => {
+        try {
+            const response = await fetch('http://192.168.56.117:8000/stop_video');
+            if (response.ok) {
+                console.log('停止视频流');
+            } else {
+                console.error('停止失败');
+            }
+        } catch (error) {
+            console.error('停止失败:', error);
+        }
+    })
+
+</script>
+
 </html>
