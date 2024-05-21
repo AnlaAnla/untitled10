@@ -1,12 +1,9 @@
-data = set()
+from ultralytics import YOLO
 
-data.add(1)
-data.add(2)
+modle = YOLO(r"C:\Code\ML\Model\Card_cls\yolo_handcard02.pt")
+img_path = r"C:\Code\ML\Image\Card_test\test\23.jpg"
 
-data.add(1)
+results = modle.predict(img_path)
 
-print(data)
 
-for i in data:
-    print(i)
-
+print(results)

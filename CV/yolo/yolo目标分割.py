@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 
 # Load a model
-model = YOLO(r"C:\Code\ML\Model\yolo_card_seg01.pt", task='segment')  # load an official model
+model = YOLO(r"C:\Code\ML\Model\Card_cls\yolo_card_seg01.pt", task='segment')  # load an official model
 
 
 # model = YOLO('path/to/best.pt')  # load a custom model

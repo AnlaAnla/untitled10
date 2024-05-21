@@ -3,7 +3,8 @@ import numpy as np
 
 # 加载图像
 img = cv2.imread(r"C:\Code\ML\Image\Card_test\test\1234aa.jpg")
-img = cv2.resize(img,(1000,1000))
+img = cv2.resize(img, (1000, 1000))
+
 
 def addedge(img):
     # 转换为灰度图像
@@ -28,6 +29,8 @@ def addedge(img):
     # 在原始图像上叠加处理过的边缘
     result = cv2.addWeighted(img, 0.6, cv2.cvtColor(dilated, cv2.COLOR_GRAY2BGR), 0.3, 0)
     return result
+
+
 # 浮雕效果
 def relief(img):
     # 转换为灰度图像
