@@ -3,8 +3,12 @@ from fastapi import FastAPI
 from fastapi.responses import StreamingResponse
 import threading
 import uvicorn
+import asyncio
+import time
 
 app = FastAPI()
+keep_streaming = True  # 全局变量控制推流循环
+video_num = 0
 
 
 class VideoStreamHandler:
@@ -33,14 +37,33 @@ video_stream_handler = VideoStreamHandler()
 
 @app.get('/video_feed')
 async def video_feed():
+    global keep_streaming, video_num
+    video_num += 1
+    if video_num > 1:
+        video_num = 0
+        await video_stop()
+
+    print('video_num:', video_num)
+    keep_streaming = True
     return StreamingResponse(
         generate_frames(),
         media_type="multipart/x-mixed-replace;boundary=frame"
     )
 
 
+@app.get('/video_stop')
+async def video_stop():
+    print('进入video_stop')
+    global keep_streaming
+    keep_streaming = False
+    await asyncio.sleep(0.2)
+    return {'status': 'ok'}
+
+
 def generate_frames():
-    while True:
+    global keep_streaming, video_num
+    print('开始推流')
+    while keep_streaming:
         frame = video_stream_handler.get_frame()
         if frame is None:
             continue
@@ -48,11 +71,12 @@ def generate_frames():
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)  # 转化为灰度图
         ret, frame = cv2.threshold(frame, 127, 255, cv2.THRESH_BINARY)  # 阈值二值化
 
-
         ret, buffer = cv2.imencode('.jpg', frame)
         frame = buffer.tobytes()
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+        time.sleep(0.1)
+    print('结束推流')
 
 
 if __name__ == '__main__':

@@ -1,11 +1,7 @@
-from pymilvus import (
-    connections,
-    utility,
-    FieldSchema,
-    CollectionSchema,
-    DataType,
-    Collection,
-)
+from ultralytics import YOLO
 
-connections.connect("default", host="localhost", port="19530")
-print('111111111111111')
+model = YOLO(r"C:\Code\ML\Model\onnx\yolov10_handcard02_imgsz128.onnx")
+
+result = model.predict(r"C:\Code\ML\Image\Card_test\test02\5.jpg", imgsz=128)
+
+result[0].show()

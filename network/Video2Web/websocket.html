@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<img id="video-feed" src="" alt="Video Feed">
+<script>
+    const videoFeed = document.getElementById('video-feed');
+    const socket = new WebSocket('ws://localhost:8000/video_feed');
+
+    socket.binaryType = 'arraybuffer';
+
+    socket.onmessage = (event) => {
+        const blob = new Blob([event.data], {type: 'image/jpeg'});
+        const url = URL.createObjectURL(blob);
+        videoFeed.src = url;
+    };
+</script>
+</body>
+</html>

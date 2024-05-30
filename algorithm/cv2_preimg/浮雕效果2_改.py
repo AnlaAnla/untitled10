@@ -15,7 +15,7 @@ def equalize_colorimg(img):
     return result
 
 
-img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\red (1).jpg")
+img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\458a7303-e33a-4e3b-8626-156ea3269e6b_FRONT_MAIN.jpg", 0)
 img = cv2.resize(img, (800, 1000))
 # img = img + 100
 # img = img.clip(0, 255)
@@ -26,7 +26,7 @@ img = cv2.resize(img, (800, 1000))
 # img = cv2.filter2D(img, -1, kernel=kernel)
 
 # 直方图均衡化增强对比度
-img = equalize_colorimg(img)
+# img = equalize_colorimg(img)
 
 # img = cv2.Laplacian(img, cv2)
 # HPF高通滤波器
@@ -39,7 +39,19 @@ img = equalize_colorimg(img)
 # ========================================
 
 # result = img[:, :-1] - img[:, 1:] + 150
-result = img[:-1, :] - img[1:, :] + 150
+
+result = img[:-1, :] - img[1:, :]
+# 创建一个布尔掩码数组,用于标记需要加200和加100的像素位置
+mask_add_200 = np.abs(result) < 40
+mask_add_100 = np.abs(result) >= 40
+
+# 创建两个值数组,分别对应需要加200和加100的值
+values_add_200 = np.full_like(result, 200)
+values_add_100 = np.full_like(result, 150)
+
+# 使用布尔掩码和值数组进行运算
+result = np.where(mask_add_200, result + values_add_200, result)
+result = np.where(mask_add_100, result + values_add_100, result)
 
 result = result.clip(0, 255)
 cv2.imshow('img', img)

@@ -14,8 +14,8 @@ class MyOnnxYolo:
         self.boxes = None
         self.img = None
 
-    def set_result(self, img):
-        self.results = self.model.predict(img, max_det=3, verbose=False)
+    def set_result(self, img, imgsz=640):
+        self.results = self.model.predict(img, max_det=3, verbose=False, imgsz=imgsz)
 
         self.img = self.results[0].orig_img
         self.boxes = self.results[0].boxes.xyxy.cpu()

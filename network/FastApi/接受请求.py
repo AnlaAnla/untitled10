@@ -4,7 +4,10 @@ import asyncio
 import uvicorn
 import json
 import time
+import pandas as pd
+import os
 
+os.path.splitext()
 
 app = FastAPI()
 
@@ -13,6 +16,12 @@ app = FastAPI()
 async def test(front_or_back: int):
     print(front_or_back)
     return {'yes!!'}
+
+@app.post("/upload_csv")
+async def upload_csv(file: UploadFile = File(...)):
+    content = await file.read()
+    with open('temp.csv', 'wb') as f:
+        f.write(content)
 
 
 if __name__ == '__main__':
