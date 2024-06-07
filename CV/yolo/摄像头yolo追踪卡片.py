@@ -4,54 +4,6 @@ import numpy as np
 import time
 
 
-def get_object(img, boxes):
-    if len(boxes) == 0:
-        return img
-    max_area = 0
-
-    # 选出最大的框
-    x1, y1, x2, y2 = 0, 0, 0, 0
-    for box in boxes:
-        temp_x1, temp_y1, temp_x2, temp_y2 = box
-        area = (temp_x2 - temp_x1) * (temp_y2 - temp_y1)
-        if area > max_area:
-            max_area = area
-            x1, y1, x2, y2 = temp_x1, temp_y1, temp_x2, temp_y2
-
-    x1 = int(x1)
-    x2 = int(x2)
-    y1 = int(y1)
-    y2 = int(y2)
-    max_img = img[y1:y2, x1:x2, :]
-
-    # max_img = img.crop((x1, y1, x2, y2))
-    return max_img
-
-
-def check_one_card(results):
-    result_lenght = len(results[0])
-    if result_lenght > 1 or result_lenght == 0:
-        # print("检测到的卡片数量大于 1 或等于 0, 请调整图像")
-        return False
-
-    # print('此时只有一个卡片')
-    return True
-
-
-def check_new_id(results):
-    global card_temp_id
-    try:
-        card_id = int(results[0].boxes.id.item())
-        if card_id in card_temp_id:
-            return False
-        else:
-            card_temp_id.append(card_id)
-            return True
-    except:
-        print("没有检测到新id, 跳过")
-        return False
-
-
 def judge_clear(card_img):
     gray = cv2.cvtColor(card_img, cv2.COLOR_BGR2GRAY)
     # 计算拉普拉斯算子的方差, 判断图像的模糊程度
@@ -65,31 +17,20 @@ def judge_clear(card_img):
         return False
 
 
-model = YOLO(r"C:\Code\ML\Model\Card_cls\yolo_handcard02_imgsz128.pt")
+model = YOLO(r"C:\Code\ML\Model\onnx\yolov10_card_4mark_01.onnx", task='detect')
 cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
     # Read a frame from the video
     success, frame = cap.read()
-    time.sleep(0.1)
+    time.sleep(0.06)
 
     if success:
-        results = model.track(frame, persist=True, verbose=False)
+        results = model.predict(frame, verbose=False)
         # results = model.predict(frame)
         annotated_frame = results[0].plot()
 
-        # 仅当有一个卡片并且 id变化时, 记录
-        # if check_one_card(results) and check_new_id(results):
-        if check_one_card(results):
-
-            conf = results[0].boxes.conf[0].item()
-            card_img = get_object(frame, results[0].boxes.xyxy.cpu())
-
-            if conf > 0.75 and judge_clear(card_img):
-                print("==========================清晰且可信, 发送图片")
-                cv2.imshow("Card YES !!", annotated_frame)
-
-        cv2.imshow("Card NO !!!", annotated_frame)
+        cv2.imshow("show", annotated_frame)
 
         if cv2.waitKey(1) & 0xFF == ord("q"):
             break
