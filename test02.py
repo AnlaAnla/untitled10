@@ -1,31 +1,21 @@
 import os
 
+from ultralytics import YOLO
+import numpy as np
+import time
+import cv2
 
 
 
-def replace_label_id(label_path):
-    with open(label_path, 'r', encoding='utf-8') as f:
-        data = f.readlines()
+model = YOLO(r"C:\Code\ML\Model\onnx\yolov10_card_4mark_01.onnx", task='detect')
 
-    new_data = []
-    for line in data:
-        if line[0] == '1':
-            new_line = '2' + line[1:]
-        # elif line[0] == '1':
-        #     new_line = '0' + line[1:]
-        else:
-            new_line = line
+data_path = r"C:\Code\ML\Image\Card_test\yolo_mark_test"
 
-        new_data.append(new_line)
+for img_name in os.listdir(data_path):
+    img_path = os.path.join(data_path, img_name)
+    results = model.predict(img_path)
+    img = results[0].plot()
 
-    with open(label_path, 'w', encoding='utf-8') as f:
-        f.writelines(new_data)
-
-
-if __name__ == '__main__':
-    label_dir = r"C:\Code\ML\Image\yolo_data02\series\annotations"
-
-    for label_name in os.listdir(label_dir):
-        label_path = os.path.join(label_dir, label_name)
-        replace_label_id(label_path)
-        print(label_path)
+    cv2.imwrite(img_path, img)
+    print(img_path)
+print('end')

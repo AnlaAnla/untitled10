@@ -1,12 +1,15 @@
 import gradio as gr
 
-def greet(name, instensity):
-    return f"Hello, {name}! {instensity}"
+
+def greet(name):
+    return f"Hello, {name}!"
+
 
 demo = gr.Interface(
     fn=greet,
-    inputs=['text', 'slider'],
-    outputs=['text'],
+    inputs=['textbox'],
+    outputs=['textbox'],
 )
 
 demo.launch()
+
