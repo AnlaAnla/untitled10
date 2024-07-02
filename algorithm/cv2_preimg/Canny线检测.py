@@ -1,18 +1,26 @@
 import cv2
 import numpy as np
 
-img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\35465.jpg", 0)
+img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\2 (10).jpg", 0)
+img = cv2.GaussianBlur(img, (5, 5), 0)
+
+kernel = np.ones((5, 5), np.uint8)
+
+# 闭运算
+# img = cv2.morphologyEx(img, cv2.MORPH_CLOSE, kernel)
+# 开运算,先腐蚀后膨胀
+# img = cv2.morphologyEx(img, cv2.MORPH_OPEN, kernel)
 
 edges = cv2.Canny(img, 100, 200)
 # cv2.imshow('edges', edges)
-# cv2.waitKey(0)
+# cv2.waitKey(0)x
 # cv2.destroyAllWindows()
 
 precess = 1
 
 if precess == 1:
     # 1.进行霍夫线变换检测直线
-    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 20, minLineLength=20, maxLineGap=9)
+    lines = cv2.HoughLinesP(edges, 1, np.pi / 180, 30, minLineLength=60, maxLineGap=10)
 
     # 遍历检测到的线段,过滤掉较短的线段
     filtered_lines = []
