@@ -1,6 +1,7 @@
 import os
 import PIL.Image as Image
 import cv2
+import glob
 from PIL import ImageFile
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
@@ -10,12 +11,14 @@ from CV.vec_process.MyOnnxYolo import MyOnnxYolo
 if __name__ == '__main__':
     model = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
 
-    train_dir = r"C:\Code\ML\Image\Card_test\psa_source"
+    # train_dir = r"C:\Code\ML\Image\Card_test\psa_source"
+    #
+    # for img_name in os.listdir(train_dir):
+    #     img_path = os.path.join(train_dir, img_name)
+    img_paths = glob.glob(r"C:\Code\ML\Image\card_cls2\Series_cls01\train\*\*.jpg")
 
     img_num = 0
-    for img_name in os.listdir(train_dir):
-        img_path = os.path.join(train_dir, img_name)
-
+    for img_path in img_paths:
         # 排除224*224
         img = Image.open(img_path).convert('RGB')
         img_num += 1
@@ -24,8 +27,8 @@ if __name__ == '__main__':
 
         model.set_result(img)
         yolo_img = model.get_max_img(cls_id=0)
-        # img_yolo_224 = cv2.resize(yolo_img, (224, 224))
-        cv2.imwrite(img_path, yolo_img)
+        img_yolo_224 = cv2.resize(yolo_img, (224, 224))
+        cv2.imwrite(img_path, img_yolo_224)
 
-        print(img_num, img_name, ': yes')
+        print(img_num, os.path.split(img_path)[-1], ': yes')
     print('end')

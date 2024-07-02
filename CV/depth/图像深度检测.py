@@ -17,11 +17,17 @@ cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
     ret, frame = cap.read()
+    img = frame
     if ret:
         frame = Image.fromarray(frame)
         depth = pipe(frame)['depth']
         depth = np.array(depth)
-        cv2.imshow('frame', depth)
+
+        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = (img + depth)//2
+
+        # img = np.concatenate((img, depth), axis=0)
+        cv2.imshow('frame', img)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break

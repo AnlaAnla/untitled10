@@ -70,6 +70,8 @@ def img_angle_correct(img_path):
         return
 
     mask = results[0].masks[0].data.numpy()[0].astype(np.uint8)
+    plt.imshow(mask)
+    plt.show()
     mask_corrected = correct(img, mask)
 
     cv2.imwrite(img_path, mask_corrected)

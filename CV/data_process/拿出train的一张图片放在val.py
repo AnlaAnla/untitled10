@@ -5,8 +5,8 @@ import shutil
 
 # 遍历source_dir中的所有子目录，并从每个子目录中复制第n个文件到dst_dir中的相应子目录
 # 如果目标子目录不存在，会创建一个。
-source_dir = r"C:\Code\ML\Image\card_cls\train_data6_224\train"
-dst_dir = r"C:\Code\ML\Image\card_cls\train_data6_224\val"
+source_dir = r"C:\Code\ML\Image\card_cls2\Series_cls01\train"
+dst_dir = r"C:\Code\ML\Image\card_cls2\Series_cls01\val"
 num_of_move = 1
 
 
