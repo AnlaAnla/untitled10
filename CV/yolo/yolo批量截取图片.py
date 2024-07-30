@@ -15,7 +15,7 @@ if __name__ == '__main__':
     #
     # for img_name in os.listdir(train_dir):
     #     img_path = os.path.join(train_dir, img_name)
-    img_paths = glob.glob(r"C:\Code\ML\Image\card_cls2\Series_cls01\train\*\*.jpg")
+    img_paths = glob.glob(r"C:\Code\ML\Image\card_cls2\optic_select_prizm_clsData\temp\*\*")
 
     img_num = 0
     for img_path in img_paths:
@@ -28,6 +28,7 @@ if __name__ == '__main__':
         model.set_result(img)
         yolo_img = model.get_max_img(cls_id=0)
         img_yolo_224 = cv2.resize(yolo_img, (224, 224))
+
         cv2.imwrite(img_path, img_yolo_224)
 
         print(img_num, os.path.split(img_path)[-1], ': yes')

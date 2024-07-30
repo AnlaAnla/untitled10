@@ -1,14 +1,11 @@
-from transformers import AutoModelForQuestionAnswering, AutoTokenizer, pipeline
+from transformers import AutoTokenizer, AutoModelForTokenClassification
+from transformers import pipeline
 
-model_name = "deepset/roberta-base-squad2"
+tokenizer = AutoTokenizer.from_pretrained("dslim/distilbert-NER")
+model = AutoModelForTokenClassification.from_pretrained("dslim/distilbert-NER")
 
-# a) Get predictions
-nlp = pipeline('question-answering', model=model_name, tokenizer=model_name)
-
-question_list = ["What is this person name?",
-                 "What is this team?",
-                 "What is the year information near symbol 'base'?"]
-context = '''
+nlp = pipeline("ner", model=model, tokenizer=tokenizer)
+example = '''
 No. 196
 DEVONTE'
 GRAHAM
@@ -26,10 +23,9 @@ STL BLK PTS PPG
 2020-21 PANINI-MOSAIC BASKETBALL帕尼尼©2021 Panini America,Inc.© 2021 NBA Properties, Inc. Produced in the USA.© 2021 Officially licensed product of the National Baskethall Players Association.
     '''
 
-for question in question_list:
-    QA_input = {
-        'question': question,
-        'context': context
-    }
-    res = nlp(QA_input)
-    print(res)
+ner_results = nlp(example)
+print(ner_results)
+for data in ner_results:
+    print(f"{data['entity']}: {data['word']}")
+
+print()

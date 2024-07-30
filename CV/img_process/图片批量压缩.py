@@ -3,7 +3,40 @@ import cv2
 from queue import Queue
 from functools import partial
 import os
+import numpy as np
 import glob
+
+
+def letterbox(src_path, target_size=1024):
+    # 读取原始图像
+    img = cv2.imread(src_path)
+    if img.shape[0] < 1200 or img.shape[1] < 1200:
+        img = None
+        return
+
+    # 获取原始图像的高度和宽度
+    h, w = img.shape[:2]
+
+    # 计算目标缩放比例
+    # target_size = 1024
+    ratio = target_size / max(h, w)
+
+    # 计算缩放后的尺寸
+    new_h = int(h * ratio)
+    new_w = int(w * ratio)
+
+    # 执行缩放
+    img = cv2.resize(img, (new_w, new_h))
+
+    # 创建一个新的画布,用黑色填充
+    canvas = np.zeros((target_size, target_size, 3), dtype=np.uint8)
+
+    # 将缩放后的图像粘贴到新画布的中心
+    y_offset = (target_size - new_h) // 2
+    x_offset = (target_size - new_w) // 2
+    canvas[y_offset:y_offset + new_h, x_offset:x_offset + new_w] = img
+
+    cv2.imwrite(src_path, canvas)
 
 
 def compress_img(src_path, ratio=0.5):
@@ -29,14 +62,17 @@ def worker(image_paths, progress_queue, compress_func):
 
 if __name__ == '__main__':
 
-    image_paths = glob.glob(r"C:\Code\ML\Image\yolo_data02\Caed_Pokemon_box\train\*.jpg")
+    image_paths = glob.glob(r"C:\Code\ML\Image\yolo_data02\card_box_7_22\train\*.jpg")
 
     # 创建一个队列来接收处理进度
     progress_queue = Queue()
 
     # 创建线程
     num_threads = 4
-    compress_partial = partial(compress_img, ratio=0.3)
+    # 设置压缩方式
+    # compress_partial = partial(compress_img, ratio=0.3)
+    compress_partial = partial(letterbox, target_size=1024)
+
     threads = []
     chunk_size = len(image_paths) // num_threads
     for i in range(num_threads):

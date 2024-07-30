@@ -17,7 +17,9 @@ kernel = np.array([[-1, 0],
 result = cv2.filter2D(img, -1, kernel) + 150
 result.clip(0, 255)
 
+cv2.imwrite('temp.jpg', result)
+
 # 显示结果
-cv2.imshow('Result', result)
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+# cv2.imshow('Result', result)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
