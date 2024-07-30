@@ -4,3 +4,5 @@ path = r"C:\Code\ML\Image\yolo_data02\Card_scratch\Scratch\scratch1\anylabels\im
 with open(path, encoding='utf-8') as f:
     data = json.load(f)
 print(data)
+
+print("验证")
