@@ -2,7 +2,7 @@ import os
 import uuid
 
 img_dir_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch\0729pokemon\images"
-labels_dir_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch\Scratch\0725边角标记"
+labels_dir_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch\0729pokemon\labels"
 
 for i, img_all_name in enumerate(os.listdir(img_dir_path)):
     img_name = os.path.splitext(img_all_name)[0]
