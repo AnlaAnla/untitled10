@@ -6,6 +6,8 @@ img = Image.open(img_path).convert('RGB')
 model.set_result(img)
 yolo_img = model.get_max_img(cls_id=0)
 '''
+
+
 class MyOnnxYolo:
     # cls_id {card:0, person:1, hand:2}
     def __init__(self, model_path):

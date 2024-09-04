@@ -1,20 +1,11 @@
-import pandas as pd
-import numpy as np
-import cv2
-import os
+import re
 
-path = r"C:\Users\wow38\Documents\WeChat Files\wxid_nilj9ybra13v22\FileStorage\File\2024-07\宝可梦0725.csv"
 
-df = pd.read_csv(path)
-img = np.array(df)
+regex = re.compile(
+    r'(?P<year>(?:\d{4}\-\d{2})|(?:\d{4}))\s+(?P<sport>Basketball|Donruss)?\s*(?P<supplier>Panini|Topps)?\s*(?P<series>Mosaic|Prizm|Optic|Select|Chrome|One\sand\sOne)\s+(?:(Premier\sLeague|UEFA)\s+)?(?P<player>[\w\.\'\s\-]+)\s*(-\s*(?P<team>[\w\d\.\s\-]+))?\s+(?P<no>#\d+)',
+    re.IGNORECASE)
 
-# img = img[:-1, :] - img[1:, :]
-# img = img[:, -1:] - img[:, 1:]
-
-img = np.clip(img, 1.8, 2)
-img = img - img.min()
-
-img = (img - img.min()) / (img.max() - img.min()) * 255
-# img = cv2.flip(img, 1)
-
-cv2.imwrite(f"img.jpg", img)
+tag = '2023-24 Donruss Optic Brook Lopez #15'
+regMatch = regex.match(tag)
+groupDict = regMatch.groupdict()
+print(groupDict)

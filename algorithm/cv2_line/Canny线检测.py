@@ -1,7 +1,8 @@
 import cv2
 import numpy as np
 
-img = cv2.imread(r"C:\Code\ML\Image\Card\Pokemon\2024_05_24___02_36_57.jpg", 0)
+img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\7e8078a2c1f74c02cf403abc14ee76c.jpg", 0)
+img = cv2.resize(img, (500, 500))
 img = cv2.GaussianBlur(img, (5, 5), 0)
 
 kernel = np.ones((5, 5), np.uint8)

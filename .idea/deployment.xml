@@ -23,13 +23,6 @@
           </mappings>
         </serverdata>
       </paths>
-      <paths name="martin@100.64.1.9 password">
-        <serverdata>
-          <mappings>
-            <mapping local="$PROJECT_DIR$" web="/" />
-          </mappings>
-        </serverdata>
-      </paths>
       <paths name="martin@100.64.1.9:22 password">
         <serverdata>
           <mappings>
@@ -59,6 +52,20 @@
         </serverdata>
       </paths>
       <paths name="martin@100.64.1.9:22 password (5)">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="martin@192.168.66.117 password">
+        <serverdata>
+          <mappings>
+            <mapping local="$PROJECT_DIR$" web="/" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="martin@192.168.66.117:22 password (6)">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

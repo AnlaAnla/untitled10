@@ -46,12 +46,12 @@ def AnyLabeling2Yolo(Anylabeling_path):
 
 
 if __name__ == '__main__':
-    classes_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch\classes.txt"
+    classes_path = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\classes.txt"
     classes = open(classes_path).read().splitlines()
     print(classes)
 
-    AnyLabels_dir = r"C:\Code\ML\Image\yolo_data02\Card_scratch\0729pokemon\anylabels"
-    YoloLabels_save_dir = r"C:\Code\ML\Image\yolo_data02\Card_scratch\0729pokemon\labels"
+    AnyLabels_dir = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\anylabels"
+    YoloLabels_save_dir = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\labels"
 
     for AnyLabel_name in tqdm(os.listdir(AnyLabels_dir)):
         AnyLabel_path = os.path.join(AnyLabels_dir, AnyLabel_name)

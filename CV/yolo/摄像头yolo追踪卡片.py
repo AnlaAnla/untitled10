@@ -17,13 +17,13 @@ def judge_clear(card_img):
         return False
 
 
-model = YOLO(r"C:\Code\ML\Model\onnx\yolov10_card_4mark_01.onnx", task='detect')
+model = YOLO(r"C:\Code\ML\Model\Card_Box\yolov10_card_scratch01.onnx", task='detect')
 cap = cv2.VideoCapture(0)
 
 while cap.isOpened():
     # Read a frame from the video
     success, frame = cap.read()
-    time.sleep(0.06)
+    time.sleep(0.08)
 
     if success:
         results = model.predict(frame, verbose=False)

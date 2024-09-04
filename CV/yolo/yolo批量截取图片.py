@@ -3,10 +3,10 @@ import PIL.Image as Image
 import cv2
 import glob
 from PIL import ImageFile
+
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from CV.vec_process.MyOnnxYolo import MyOnnxYolo
-
+from utils.MyOnnxYolo import MyOnnxYolo
 
 if __name__ == '__main__':
     model = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
@@ -15,7 +15,7 @@ if __name__ == '__main__':
     #
     # for img_name in os.listdir(train_dir):
     #     img_path = os.path.join(train_dir, img_name)
-    img_paths = glob.glob(r"C:\Code\ML\Image\card_cls2\optic_select_prizm_clsData\temp\*\*")
+    img_paths = glob.glob(r"C:\Code\ML\Image\_CLASSIFY\card_cls2\2022-23\train\*\*")
 
     img_num = 0
     for img_path in img_paths:

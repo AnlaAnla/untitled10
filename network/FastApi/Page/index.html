@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="cn">
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>显示图片</title>
+</head>
+<body>
+    <img id="image" src="" alt="Image">
+
+    <script>
+        fetch('http://127.0.0.1:8000/image')
+            .then(response => response.blob())
+            .then(blob => {
+                const imageUrl = URL.createObjectURL(blob);
+                const img = document.getElementById('image');
+                img.src = imageUrl;
+            })
+            .catch(error => console.error(error));
+    </script>
+</body>
+</html>

@@ -32,7 +32,7 @@ def convert_3d(r):
     return s
 
 
-im = PIL.Image.open(r"C:\Code\ML\Image\Card_test\test03\2024_06_20___02_46_36.jpg")
+im = PIL.Image.open(r"C:\Code\ML\Image\Card_test\test03\7e8078a2c1f74c02cf403abc14ee76c.jpg")
 im_mat = np.asarray(im)
 im_converted_mat = convert_3d(im_mat)
 im_converted = PIL.Image.fromarray(im_converted_mat)

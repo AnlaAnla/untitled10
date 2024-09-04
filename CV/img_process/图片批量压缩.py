@@ -10,7 +10,7 @@ import glob
 def letterbox(src_path, target_size=1024):
     # 读取原始图像
     img = cv2.imread(src_path)
-    if img.shape[0] < 1200 or img.shape[1] < 1200:
+    if img.shape[0] <= target_size or img.shape[1] <= target_size:
         img = None
         return
 
@@ -42,7 +42,7 @@ def letterbox(src_path, target_size=1024):
 def compress_img(src_path, ratio=0.5):
     # 当前目录读取一张图片
     img = cv2.imread(src_path)
-    if img.shape[0] < 1200 or img.shape[1] < 1200:
+    if img.shape[0] < 1024 or img.shape[1] < 1024:
         img = None
         return
     # 调整长宽
@@ -54,6 +54,15 @@ def compress_img(src_path, ratio=0.5):
     img = None
 
 
+def resize_img(src_path, target_size=640):
+    img = cv2.imread(src_path)
+    if img.shape[0] <= target_size or img.shape[1] <= target_size:
+        img = None
+        return
+    img = cv2.resize(img, (target_size, target_size))
+    cv2.imwrite(src_path, img)
+
+
 def worker(image_paths, progress_queue, compress_func):
     for src_path in image_paths:
         compress_func(src_path)
@@ -62,7 +71,7 @@ def worker(image_paths, progress_queue, compress_func):
 
 if __name__ == '__main__':
 
-    image_paths = glob.glob(r"C:\Code\ML\Image\yolo_data02\card_box_7_22\train\*.jpg")
+    image_paths = glob.glob(r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0806\images\*.jpg")
 
     # 创建一个队列来接收处理进度
     progress_queue = Queue()
@@ -70,8 +79,9 @@ if __name__ == '__main__':
     # 创建线程
     num_threads = 4
     # 设置压缩方式
+    compress_partial = partial(resize_img, target_size=640)
     # compress_partial = partial(compress_img, ratio=0.3)
-    compress_partial = partial(letterbox, target_size=1024)
+    # compress_partial = partial(letterbox, target_size=1024)
 
     threads = []
     chunk_size = len(image_paths) // num_threads

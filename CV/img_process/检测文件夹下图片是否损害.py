@@ -3,7 +3,7 @@ import glob
 import time
 import PIL.Image as Image
 from multiprocessing import Pool
-
+from tqdm import tqdm
 
 
 def check(img_path):
@@ -13,7 +13,8 @@ def check(img_path):
     try:
         img = Image.open(img_path)
         img.load()
-        print("{}, {} ,{}".format(num, img.size, img_path))
+        img.close()
+        # print("{}, {} ,{}".format(num, img.size, img_path))
 
         # if img.size[0] < 224 or img.size[1] < 224:
         #     img.close()
@@ -23,21 +24,21 @@ def check(img_path):
 
     except Exception as e:
         print(f'读取图片失败，删除: {img_path}, \t错误信息: {e}')
-        os.remove(img_path)
+        img.close()
+        # os.remove(img_path)
         bad_num += 1
 
     num += 1
 
 
 if __name__ == '__main__':
-    img_paths = glob.glob(r"C:\Code\ML\Image\card_cls\All_Pokemon_Card\data01\*")
+    img_paths = glob.glob(r"C:\Code\ML\Image\_SEGMENT\1986 Fleer Michael Jordan 57_psa_item_lots\*\*")
     num = 0
     bad_num = 0
 
     t1 = time.time()
 
-
-    for path in img_paths:
+    for path in tqdm(img_paths):
         check(path)
 
     t2 = time.time()

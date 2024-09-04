@@ -1,7 +1,7 @@
 import os
 import shutil
 
-source_dir = r"C:\Code\ML\Image\card_cls\train_data_allcard"
+source_dir = r"C:\Code\ML\Image\_CLASSIFY\card_cls2\2022-23\train"
 
 total = 0
 dir_nums = len(os.listdir(source_dir))

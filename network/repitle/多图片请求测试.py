@@ -14,7 +14,7 @@ def send_img(img_path):
         print(f'文件上传失败, 错误代码: {response.status_code}')
 
 if __name__ == '__main__':
-    url = "http://100.64.1.9:8080/image"
+    url = "http://http://192.168.66.117:8080/image"
 
     # img_dir = r"C:\Code\ML\Image\Card_test\mosic_prizm\prizm_yolo\base 19-20 val\#7 Yao Ming"
     img_dir = r"C:\Code\ML\Image\Card_test\mosic_prizm\prizm\base 19-20 val\#6 Allen Iverson"

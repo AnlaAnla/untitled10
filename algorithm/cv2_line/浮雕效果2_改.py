@@ -15,7 +15,7 @@ def equalize_colorimg(img):
     return result
 
 
-img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\2024_06_20___02_46_36.jpg", 0)
+img = cv2.imread(r"C:\Code\ML\Image\Card_test\test03\7e8078a2c1f74c02cf403abc14ee76c.jpg", 0)
 img = cv2.resize(img, (800, 1000))
 # img = img + 100
 # img = img.clip(0, 255)
@@ -57,5 +57,5 @@ result = result.clip(0, 255)
 cv2.imshow('img', img)
 cv2.imshow('result', result)
 
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+cv2.waitKey(0)
+cv2.destroyAllWindows()

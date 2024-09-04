@@ -1,7 +1,7 @@
 import os
 
-train_path = r"C:\Code\ML\Image\yolo_data02\card_box_7_22\train"
-labels_path = r"C:\Code\ML\Image\yolo_data02\card_box_7_22\labels"
+train_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0807\labels"
+labels_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0807\images"
 
 # 去除没有label的图片
 

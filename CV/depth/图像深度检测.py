@@ -23,11 +23,11 @@ while cap.isOpened():
         depth = pipe(frame)['depth']
         depth = np.array(depth)
 
-        img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = (img + depth)//2
+        # img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        # img = (img + depth)//2
 
         # img = np.concatenate((img, depth), axis=0)
-        cv2.imshow('frame', img)
+        cv2.imshow('frame', depth)
 
         if cv2.waitKey(1) & 0xFF == ord('q'):
             break
