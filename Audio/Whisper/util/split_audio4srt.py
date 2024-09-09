@@ -43,8 +43,7 @@ if __name__ == '__main__':
     video_path = r"D:\Code\ML\Video\video01.mp4"
     srt_path = r"D:\Code\ML\Video\output_subtitles.srt"
 
-    audio_data_save_path = r"D:\Code\ML\Audio\Data1\dataset"
-    json_data_save_path = r"D:\Code\ML\Audio\Data1"
+    data_save_path = r"D:\Code\ML\Audio\Data1"
 
     # temp_path = "temp.mp3"
 
@@ -67,7 +66,7 @@ if __name__ == '__main__':
 
         cut_audio = audio.subclip(start_time, end_time)
 
-        audio_save_name = f"audio{i}.mp3"
+        audio_save_name = f"dataset/audio{i}.mp3"
         info_save_name = f"audio{i}.json"
         info = {
             "audio":{
@@ -81,8 +80,8 @@ if __name__ == '__main__':
         # print(info)
 
         # 写入新的音频文件
-        audio_file_save_path = os.path.join(audio_data_save_path, audio_save_name)
-        info_file_save_path = os.path.join(json_data_save_path, info_save_name)
+        audio_file_save_path = os.path.join(data_save_path, audio_save_name)
+        info_file_save_path = os.path.join(data_save_path, info_save_name)
 
         cut_audio.write_audiofile(audio_file_save_path)
         with open(info_file_save_path, "w", encoding="utf-8") as f:
