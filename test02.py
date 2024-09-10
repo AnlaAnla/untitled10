@@ -1,4 +1,7 @@
-import numpy as np
+from moviepy.editor import VideoFileClip
 
-print(np.cos(38))
-print(np.tan(38))
+video = VideoFileClip(r"D:\Code\ML\Video\video01.mp4")
+audio = video.audio
+
+audio.write_audiofile(r"D:\Code\ML\Audio\tomb.mp3")
+print('end')
