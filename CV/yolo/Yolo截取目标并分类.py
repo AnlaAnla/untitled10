@@ -1,8 +1,5 @@
 import torch
-import cv2
-import time
-from torchvision import models
-from utils.MyOnnxYolo import MyOnnxYolo
+from Tool.MyOnnxYolo import MyOnnxYolo
 from torchvision import transforms
 from PIL import Image
 import os
@@ -38,7 +35,7 @@ def predict_cls(img):
     # Perform prediction
     with torch.no_grad():
         outputs = model(img_tensor)
-        _, predicted = torch.max(outputs.data, 1)
+        _, predicted = torch.max(outputs.chunk, 1)
 
     return labels[int(predicted)]
 

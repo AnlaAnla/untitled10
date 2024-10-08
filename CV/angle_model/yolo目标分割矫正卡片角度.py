@@ -69,7 +69,7 @@ def img_angle_correct(img_path):
         print(img_path, '\tNo masks detected')
         return
 
-    mask = results[0].masks[0].data.numpy()[0].astype(np.uint8)
+    mask = results[0].masks[0].chunk.numpy()[0].astype(np.uint8)
     plt.imshow(mask)
     plt.show()
     mask_corrected = correct(img, mask)

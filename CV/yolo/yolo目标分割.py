@@ -61,7 +61,7 @@ def fitLine(mask):
 
 def getAngle(img_path):
     results = model(img_path)  # predict on an image
-    mask = results[0].masks[0].data.numpy()[0]
+    mask = results[0].masks[0].chunk.numpy()[0]
 
     print('rect', minRect(mask))
     print('pac', pac(mask))

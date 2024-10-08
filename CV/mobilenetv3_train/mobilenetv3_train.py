@@ -85,7 +85,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs):
 
                 # statistics
                 running_loss += loss.item() * inputs.size(0)
-                running_corrects += torch.sum(preds == labels.data)
+                running_corrects += torch.sum(preds == labels.chunk)
 
                 # 更新进度条
                 print_progress_bar(i + 1, l, prefix='进度:', suffix='完成', length=50)

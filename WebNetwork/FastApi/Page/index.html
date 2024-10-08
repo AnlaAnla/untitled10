@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>人脸检查</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        #file-input {
+            margin-bottom: 20px;
+        }
+
+        #result {
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<h1>人脸检测</h1>
+<input type="file" id="file-input" accept="image/*">
+<button onclick="detectFace()">检查图片</button>
+<p id="result"></p>
+
+<script>
+    function detectFace() {
+        const fileInput = document.getElementById('file-input');
+        const file = fileInput.files[0];
+
+        if (!file) {
+            alert('上传图片检查有没有人脸');
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        fetch('http://127.0.0.1:8000/detect_face', {
+            method: 'POST',
+            body: formData
+        })
+            .then(response => response.json())
+            .then(data => {
+                const resultElement = document.getElementById('result');
+                resultElement.textContent = data.has_face;
+                // if (data.has_face) {
+                //     resultElement.textContent = '有人脸';
+                // } else {
+                //     resultElement.textContent = '没有人脸';
+                // }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error');
+            });
+    }
+</script>
+</body>
+</html>

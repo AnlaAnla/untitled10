@@ -6,7 +6,7 @@ from PIL import ImageFile
 
 ImageFile.LOAD_TRUNCATED_IMAGES = True
 
-from utils.MyOnnxYolo import MyOnnxYolo
+from Tool.MyOnnxYolo import MyOnnxYolo
 
 if __name__ == '__main__':
     model = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_handcard01.onnx")
