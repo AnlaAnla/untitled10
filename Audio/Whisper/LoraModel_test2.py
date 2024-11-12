@@ -12,17 +12,13 @@ from transformers import Seq2SeqTrainingArguments, BitsAndBytesConfig
 from transformers import Seq2SeqTrainer, TrainerCallback, TrainingArguments, TrainerState, TrainerControl
 from transformers.trainer_utils import PREFIX_CHECKPOINT_DIR
 
-
-
-
-
 if __name__ == '__main__':
     model_id = "openai/whisper-medium"
     task = "transcribe"
     device = "cuda:0" if torch.cuda.is_available() else "cpu"
     torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
-    peft_model_id = r"D:\Code\ML\Project\FuntineWhisper\reach-vb\train\checkpoint-100"
+    peft_model_id = r"D:\Code\ML\Model\Lora\checkpoint-100-2024Y_10M_08D_17h_43m_12s\adapter_model"
     peft_config = PeftConfig.from_pretrained(peft_model_id)
     model = WhisperForConditionalGeneration.from_pretrained(
         model_id,
@@ -44,7 +40,7 @@ if __name__ == '__main__':
         device=device,
     )
 
-    audio_path = r"D:\Code\ML\Video\merged_video.ts"
+    audio_path = r"D:\Code\ML\Audio\t7.mp3"
     result = pipe(audio_path, return_timestamps=True)
 
     # for data in result['chunks']:
@@ -86,6 +82,3 @@ if __name__ == '__main__':
         f.write(srt_file)
 
     print("保存srt字幕")
-
-
-

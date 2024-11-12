@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Real-time Speech Recognition</title>
+</head>
+<body>
+    <h1>Real-time Speech Transcription</h1>
+    <button id="startBtn">Start Recording</button>
+    <button id="stopBtn" disabled>Stop Recording</button>
+    <div>
+        <p>Transcription:</p>
+        <p id="transcription"></p>
+    </div>
+
+    <script>
+        let socket;
+        let mediaRecorder;
+        let audioChunks = [];
+
+        document.getElementById("startBtn").addEventListener("click", async () => {
+            socket = new WebSocket("ws://<your-server-ip>:8000/ws/audio");
+
+            socket.onmessage = function(event) {
+                // 显示实时识别结果
+                document.getElementById("transcription").innerText += event.data + " ";
+            };
+
+            // 请求麦克风权限并捕获音频
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream);
+
+            mediaRecorder.ondataavailable = (event) => {
+                // 每当有新的音频数据可用时，发送给服务器
+                audioChunks.push(event.data);
+                if (mediaRecorder.state === "recording") {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                    audioBlob.arrayBuffer().then(buffer => {
+                        socket.send(buffer);  // 将音频流发送给 WebSocket 服务器
+                        audioChunks = [];
+                    });
+                }
+            };
+
+            mediaRecorder.start(1000); // 每秒发送一次音频数据
+            document.getElementById("startBtn").disabled = true;
+            document.getElementById("stopBtn").disabled = false;
+        });
+
+        document.getElementById("stopBtn").addEventListener("click", () => {
+            mediaRecorder.stop();
+            socket.close();
+            document.getElementById("startBtn").disabled = false;
+            document.getElementById("stopBtn").disabled = true;
+        });
+    </script>
+</body>
+</html>

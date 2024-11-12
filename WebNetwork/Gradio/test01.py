@@ -1,46 +1,28 @@
 import gradio as gr
-from transformers import pipeline
-import torch
-from transformers import AutoModelForSpeechSeq2Seq, AutoProcessor, pipeline
-import numpy as np
-
-device = "cuda:0" if torch.cuda.is_available() else "cpu"
-torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
-
-# model_id = "openai/whisper-large-v3"
-model_id = "openai/whisper-medium"
-
-model = AutoModelForSpeechSeq2Seq.from_pretrained(
-    model_id, torch_dtype=torch_dtype, low_cpu_mem_usage=True, use_safetensors=True
-)
-model.to(device)
-
-processor = AutoProcessor.from_pretrained(model_id)
-
-pipe = pipeline(
-    "automatic-speech-recognition",
-    model=model,
-    tokenizer=processor.tokenizer,
-    feature_extractor=processor.feature_extractor,
-
-    max_new_tokens=128,
-    chunk_length_s=30,
-    batch_size=4,
-    # torch_dtype=torch_dtype,
-    device=device,
-)
-generate_kwargs = {"task": "transcribe", "num_beams": 1}
+import time
 
 
-def transcribe(filepath):
 
-    return pipe(filepath, generate_kwargs=generate_kwargs)["text"]
+# 定义音频处理函数
+def transcribe_audio():
+    transcript = ""
+
+    for i in range(50):
+        transcript += f"{i}--\n"
+        time.sleep(0.2)
+        yield transcript
 
 
-demo = gr.Interface(
-    transcribe,
-    inputs=gr.Audio(sources="upload", type="filepath"),
-    outputs=gr.Textbox(),
-)
+def get_data():
+    yield from transcribe_audio()
 
-demo.launch(server_name='0.0.0.0', debug=True)
+# 创建 Gradio 界面
+with gr.Blocks() as demo:
+    btn = gr.Button("Click")
+    text_output = gr.Textbox()  # 显示识别的文本
+
+    # 调用 transcribe_audio，动态更新 text_output
+    btn.click(get_data, outputs=text_output)
+
+# 启动 Gradio 界面
+demo.launch()

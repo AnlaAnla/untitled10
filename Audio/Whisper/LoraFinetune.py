@@ -65,14 +65,15 @@ class DataCollatorSpeechSeq2SeqWithPadding:
 def make_inputs_require_grad(module, input, output):
     output.requires_grad_(True)
 
+
 # This callback helps to save only the adapter weights and remove the base model weights.
 class SavePeftModelCallback(TrainerCallback):
     def on_save(
-        self,
-        args: TrainingArguments,
-        state: TrainerState,
-        control: TrainerControl,
-        **kwargs,
+            self,
+            args: TrainingArguments,
+            state: TrainerState,
+            control: TrainerControl,
+            **kwargs,
     ):
         checkpoint_folder = os.path.join(args.output_dir, f"{PREFIX_CHECKPOINT_DIR}-{state.global_step}")
 
@@ -83,6 +84,7 @@ class SavePeftModelCallback(TrainerCallback):
         if os.path.exists(pytorch_model_path):
             os.remove(pytorch_model_path)
         return control
+
 
 if __name__ == '__main__':
     os.environ["CUDA_VISIBLE_DEVICES"] = "0"
@@ -106,7 +108,6 @@ if __name__ == '__main__':
     tokenizer = WhisperTokenizer.from_pretrained(model_name_or_path, language=language, task=task)
     processor = WhisperProcessor.from_pretrained(model_name_or_path, language=language, task=task)
 
-
     common_voice = common_voice.map(prepare_dataset, remove_columns=common_voice.column_names["train"], num_proc=1)
     data_collator = DataCollatorSpeechSeq2SeqWithPadding(processor=processor)
 
@@ -123,8 +124,6 @@ if __name__ == '__main__':
     # 查看参与训练的参数
     model = get_peft_model(model, config)
     model.print_trainable_parameters()
-
-
 
     training_args = Seq2SeqTrainingArguments(
         output_dir="reach-vb/test",  # change to a repo name of your choice
