@@ -1,6 +1,5 @@
 import numpy as np
 import matplotlib.pyplot as plt
-from multiprocessing import Process, Queue
 
 # 定义元素类型
 EMPTY = 0
@@ -19,6 +18,9 @@ class World:
     def __init__(self, size=100, grass_growth_rate=0.005):
         self.size = size
         self.grass_growth_rate = grass_growth_rate
+        self.herbivore_breed_threshold = 100  # 素食者繁殖临界值
+        self.carnivore_breed_threshold = 100  # 肉食者繁殖临界值
+
         self.map = np.zeros((size, size), dtype=int)  # 初始化地图
         self.animals = {}  # 存储动物对象，键是位置元组，值是 Animal 实例
 
@@ -29,7 +31,7 @@ class World:
                 x, y = np.random.randint(0, self.size, size=2)
                 if self.map[x, y] == EMPTY or self.map[x, y] == GRASS:  # 只在空地和草地生成
                     self.map[x, y] = animal_type
-                    self.animals[(x, y)] = Animal(hp=20, animal_type=animal_type)
+                    self.animals[(x, y)] = Animal(hp=10, animal_type=animal_type)
                     break
 
     def grow_grass(self):
@@ -91,7 +93,7 @@ class World:
                 self.map[nx, ny] = animal.type
                 new_animals[(nx, ny)] = animal
             elif self.map[nx, ny] == GRASS and animal.type == HERBIVORE:  # 素食者吃草
-                if animal.hp // 2 >= 100:  # 素食者繁衍
+                if animal.hp // 2 >= self.herbivore_breed_threshold:  # 素食者繁衍
                     self.map[x, y] = HERBIVORE
                     self.map[nx, ny] = HERBIVORE
                     animal.hp //= 2
@@ -115,7 +117,7 @@ class World:
                     animal.hp += self.animals[(nx, ny)].hp
                     del self.animals[(nx, ny)]
 
-                if animal.hp // 2 >= 100:
+                if animal.hp // 2 >= self.carnivore_breed_threshold:  # 肉食者繁殖
                     animal.hp //= 2
 
                     new_animals[(x, y)] = animal
@@ -153,73 +155,75 @@ class World:
         return num_list
 
 
-def simulation_worker(world, queue, steps):
-    """后台模拟逻辑"""
-    for step in range(steps):
-        world.update()
-        herbivore, carnivore = world.get_num()[2:]  # 获取素食者和肉食者数量
-        queue.put((step, world.get_map(), herbivore, carnivore))  # 将结果放入队列
-
-
-def plot_worker(queue):
-    """前台绘图逻辑"""
-    plt.figure(figsize=(16, 8))
-    plt.ion()
-
-    # 创建两个子图
-    ax_map = plt.subplot(1, 2, 1)
-    ax_curve = plt.subplot(1, 2, 2)
-
-    herbivore_num = []
-    carnivore_num = []
-
-    while True:
-        data = queue.get()
-        if data is None:  # 收到结束信号
-            break
-
-        step, map_data, herbivore, carnivore = data
-        herbivore_num.append(herbivore)
-        carnivore_num.append(carnivore)
-
-        # 更新地图
-        ax_map.clear()
-        ax_map.set_title(f"Step: {step}")
-        ax_map.imshow(map_data, origin="upper")
-
-        # 更新曲线
-        ax_curve.clear()
-        ax_curve.set_title("Animal Population Over Time")
-        ax_curve.plot(herbivore_num, label=f"Herbivores [{herbivore}]", color="blue")
-        ax_curve.plot(carnivore_num, label=f"Carnivores [{carnivore}]", color="red")
-        ax_curve.set_xlabel("Time Step")
-        ax_curve.set_ylabel("Population")
-        ax_curve.legend()
-
-        plt.pause(0.0005)
-
-    plt.ioff()
-    plt.show()
-
-
 def simulate():
-    world = World(size=400, grass_growth_rate=0.002)
+    world = World(size=200, grass_growth_rate=0.005)
     world.random_spawn(150, HERBIVORE)
     world.random_spawn(50, CARNIVORE)
 
-    steps = 8000  # 模拟步数
-    queue = Queue()
+    is_visible = False
 
-    # 启动后台模拟进程
-    simulation_process = Process(target=simulation_worker, args=(world, queue, steps))
-    simulation_process.start()
+    if is_visible:
+        plt.figure(figsize=(16, 8))
+        plt.ion()  # 开启交互模式
 
-    # 启动绘图进程
-    plot_worker(queue)
+        # 创建两个子图：左侧地图，右侧曲线图
+        ax_map = plt.subplot(1, 2, 1)
+        ax_curve = plt.subplot(1, 2, 2)
 
-    # 等待模拟进程完成
-    simulation_process.join()
-    queue.put(None)  # 发送结束信号
+        herbivore_num = []
+        carnivore_num = []
+
+        for step in range(118800):
+            world.update()
+
+            _, _, herbivore, carnivore = world.get_num()  # 获取统计数量
+
+            print(f"herbivore: {herbivore}, carnivore: {carnivore}")
+            if herbivore == 0 or carnivore == 0:
+                break
+            herbivore_num.append(herbivore)
+            carnivore_num.append(carnivore)
+
+            ax_map.clear()
+            ax_map.set_title(f"Step: {step}")
+            ax_map.imshow(world.get_map(), cmap="viridis", origin="upper")
+
+            # 绘制曲线
+            ax_curve.clear()
+            ax_curve.set_title("Animal Population Over Time")
+            ax_curve.plot(herbivore_num, label=f"Herbivores [{herbivore}]", color="blue")
+            ax_curve.plot(carnivore_num, label=f"Carnivores [{carnivore}]", color="red")
+            ax_curve.set_xlabel("Time Step")
+            ax_curve.set_ylabel("Population")
+            ax_curve.legend()
+
+            plt.pause(0.00001)
+
+        plt.ioff()
+        plt.show()
+
+    else:
+        # ======非可视化模式========
+
+        for i in range(20, 300, 10):
+            for j in range(20, 300, 10):
+                herbivore_threshold = i
+                carnivore_threshold = j
+                world.herbivore_breed_threshold = herbivore_threshold
+                world.carnivore_breed_threshold = carnivore_threshold
+
+                for step in range(5000):
+                    world.update()
+
+                    _, _, herbivore, carnivore = world.get_num()  # 获取统计数量
+
+                    if step % 200 == 0:
+                        print(f"参数[{i},{j}], step: {step}, herbivore: {herbivore}, carnivore: {carnivore}")
+                    if herbivore == 0 or carnivore == 0:
+                        print('+' * 30)
+                        print(f"参数[{i},{j}], result [step: {step}, herbivore: {herbivore}, carnivore: {carnivore}]")
+                        print('+' * 30)
+                        break
 
 
 if __name__ == '__main__':
