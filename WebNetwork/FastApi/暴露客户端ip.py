@@ -8,7 +8,7 @@ app = FastAPI()
 async def report_ip(request: Request):
     client_ip = request.client.host
     print(f"Client IP: {client_ip}")
-    return {"message": "IP reported successfully"}
+    return {"message": f"your ip: {client_ip}"}
 
 
 # Run the server with `uvicorn main:app --host 0.0.0.0 --port 8000`

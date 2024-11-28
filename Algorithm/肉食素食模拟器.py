@@ -156,11 +156,11 @@ class World:
 
 
 def simulate():
-    world = World(size=200, grass_growth_rate=0.005)
+    world = World(size=300, grass_growth_rate=0.002)
     world.random_spawn(150, HERBIVORE)
     world.random_spawn(50, CARNIVORE)
 
-    is_visible = False
+    is_visible = True
 
     if is_visible:
         plt.figure(figsize=(16, 8))
@@ -173,14 +173,17 @@ def simulate():
         herbivore_num = []
         carnivore_num = []
 
+        world.herbivore_breed_threshold = 100
+        world.carnivore_breed_threshold = 100
+
         for step in range(118800):
             world.update()
 
             _, _, herbivore, carnivore = world.get_num()  # 获取统计数量
 
-            print(f"herbivore: {herbivore}, carnivore: {carnivore}")
-            if herbivore == 0 or carnivore == 0:
-                break
+            # print(f"herbivore: {herbivore}, carnivore: {carnivore}")
+            # if herbivore == 0 or carnivore == 0:
+            #     break
             herbivore_num.append(herbivore)
             carnivore_num.append(carnivore)
 

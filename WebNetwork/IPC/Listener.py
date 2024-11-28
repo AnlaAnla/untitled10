@@ -1,5 +1,6 @@
 from multiprocessing import Process, Pipe
 
+
 def listener(receive_pipe):
     while True:
         data = receive_pipe.recv()  # 阻塞等待数据
@@ -7,6 +8,7 @@ def listener(receive_pipe):
             print("Listener ending.")
             break
         print(f"Listener received: {data}")
+
 
 if __name__ == '__main__':
     parent_conn, child_conn = Pipe()

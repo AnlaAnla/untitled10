@@ -10,14 +10,14 @@ import os
 import time
 
 os.environ['KMP_DUPLICATE_LIB_OK'] = 'True'
-# model_size = "D:\Code\ML\Model\huggingface\whisper-largev3-ct2"
+
 model_size = "deepdml/faster-whisper-large-v3-turbo-ct2"
 # model_size = "medium"
 
 # Run on GPU with FP16
 model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
-audio_path = r"D:\Code\ML\Audio\t7.mp3"
+audio_path = r"D:\Code\ML\Audio\tomb.mp3"
 # 加载视频文件
 # video = mp.VideoFileClip(r"D:\Code\ML\Video\card_video\2024_09_11 13_15_31.mp4")
 

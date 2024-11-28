@@ -5,7 +5,8 @@ import os
 app = FastAPI()
 
 # 文件路径
-FILE_PATH = r"D:\Code\ML\Text\12.txt"  # 请替换为你要下载的文件路径
+FILE_PATH = r"D:\Code\ML\Project\FuntineWhisper\utils\audio_recognize_server.py"  # 请替换为你要下载的文件路径
+
 
 @app.get("/download")
 async def download_file():
@@ -15,9 +16,9 @@ async def download_file():
     else:
         return {"error": "File not found"}
 
+
 # curl -O http://your_server_ip:8000/download/
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=8888)
-
-
