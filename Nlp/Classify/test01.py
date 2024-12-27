@@ -2,7 +2,8 @@ import pandas as pd
 import numpy as np
 import os
 
-data = pd.read_csv(r"D:\Code\ML\Text\Classify\test01.csv", encoding="utf-8")
+data = pd.read_csv(r"D:\Code\ML\Text\Classify\11metadata.csv", encoding="utf-8")
+data = data[:1035]
 
 # 假设您已经有了 data 这个 DataFrame
 # data['label'] 是您需要处理的那一列

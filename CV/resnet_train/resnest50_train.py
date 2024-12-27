@@ -120,11 +120,13 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     return model
 
 
-def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None,
+def train(epoch=30, lr_rate=0.01, save_path='resnet.pth', load_my_model=False, model_path=None,
           is_freeze=True, freeze_num=7, is_transfer_learn=False, transfer_cls=None):
     # 如果不加载训练过的模型则加载预训练模型
+    torch.hub.list('zhanghang1989/ResNeSt')
     if load_my_model:
-        model = models.resnet50(pretrained=False)
+        # model = models.resnet50(pretrained=False)
+        model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=False)
         num_features = model.fc.in_features
         if is_transfer_learn:
             # 加载旧模型后,更改为新模型的分类格式
@@ -140,7 +142,7 @@ def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None
             model.load_state_dict(torch.load(model_path))
 
     else:
-        model = models.resnet50(pretrained=True)
+        model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
         # 修改最后一层
         num_features = model.fc.in_features
         model.fc = nn.Linear(num_features, class_num, bias=True)
@@ -148,7 +150,7 @@ def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None
     model = model.to(device)
 
     criterion = nn.CrossEntropyLoss()
-    optimizer_ft = optim.SGD(model.parameters(), lr=0.01, momentum=0.9)
+    optimizer_ft = optim.SGD(model.parameters(), lr=lr_rate, momentum=0.9)
     exp_lr_scheduler = lr_scheduler.StepLR(optimizer_ft, step_size=7, gamma=0.1)
 
     # 冻结部分参数
@@ -169,7 +171,7 @@ def train(epoch=30, save_path='resnet.pth', load_my_model=False, model_path=None
 
 
 if __name__ == '__main__':
-    data_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\PaniniCard"
+    data_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\Serices_cls_data_yolo224"
 
     # if platform.system() == 'Windows':
     #     print('这是Windows系统')
@@ -190,6 +192,12 @@ if __name__ == '__main__':
             transforms.RandomPerspective(distortion_scale=0.5, p=0.5),
             transforms.ColorJitter(brightness=0.2, contrast=0.2),
             transforms.RandomApply([transforms.GaussianBlur(5)], p=0.3),
+            transforms.RandomChoice([
+                transforms.RandomRotation((0, 0)),  # 不旋转
+                transforms.RandomRotation((90, 90)),  # 旋转 90 度
+                transforms.RandomRotation((180, 180)),  # 旋转 180 度
+                transforms.RandomRotation((270, 270))  # 旋转 270 度
+            ]),
             transforms.RandomRotation(degrees=10),  # 添加轻微的随机旋转
 
             # transforms.RandomHorizontalFlip(),
@@ -239,9 +247,10 @@ if __name__ == '__main__':
     '''
     data_phase = ['train', 'val']
     # 数据集路径在本文件上面
-    train(epoch=12, save_path=r'D:\Code\ML\Model\Card_cls2\resnest50_01.pth',
+    train(epoch=20, lr_rate=0.01,
+          save_path=r'D:\Code\ML\Model\Card_cls2\resnest50_series01.pth',
           load_my_model=False,
-          model_path=r"C:\Users\martin\.cache\torch\hub\checkpoints\resnest50-528c19ca.pth",
+          # model_path=r'D:\Code\ML\Model\Card_cls2\resnest50_02.pth',
           # is_transfer_learn=True, transfer_cls=12796
           )
 

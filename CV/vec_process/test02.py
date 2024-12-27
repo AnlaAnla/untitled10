@@ -1,7 +1,6 @@
-import os
 import time
 import cv2
-from MyOnnxYolo import MyOnnxYolo
+from CV.vec_process.util.MyOnnxYolo import MyOnnxYolo
 
 if __name__ == '__main__':
     onnxYolo = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolov10_handcard02_imgsz128.onnx")

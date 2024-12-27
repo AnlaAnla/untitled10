@@ -1,10 +1,9 @@
-import os
 import time
 
 import cv2
 
-from MyOnnxModel_MobileNetV3 import MyOnnxModel
-from MyOnnxYolo import MyOnnxYolo
+from CV.vec_process.util.MyOnnxModel_MobileNetV3 import MyOnnxModel
+from CV.vec_process.util.MyOnnxYolo import MyOnnxYolo
 import numpy as np
 
 

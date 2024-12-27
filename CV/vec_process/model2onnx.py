@@ -41,11 +41,11 @@ def onnx_run(onnx_file_path):
 
 
 if __name__ == '__main__':
-    model = models.mobilenet_v3_large(pretrained=False)
-    # 修改最后一层
-    model.classifier[-1] = torch.nn.Linear(in_features=1280, out_features=17355, bias=True)
-    model.load_state_dict(torch.load(r"C:\Code\ML\Model\mobilenetv3_out17355_AllCard09.pth", map_location='cpu'))
-    model2onnx(model.features, r"C:\Code\ML\Model\onnx\mobilenetv3_features_AllCard09.onnx")
+    # model = models.mobilenet_v3_large(pretrained=False)
+    # # 修改最后一层
+    # model.classifier[-1] = torch.nn.Linear(in_features=1280, out_features=17355, bias=True)
+    # model.load_state_dict(torch.load(r"C:\Code\ML\Model\mobilenetv3_out17355_AllCard09.pth", map_location='cpu'))
+    # model2onnx(model.features, r"C:\Code\ML\Model\onnx\mobilenetv3_features_AllCard09.onnx")
 
     # resnet50
     # model = models.resnet50(pretrained=False)
@@ -58,4 +58,16 @@ if __name__ == '__main__':
     # model = torch.nn.Sequential(*features)
     #
     # model2onnx(model, r"C:\Code\ML\Model\resent_out17355_AllCard08.onnx")
+
+    # resnest50
+    torch.hub.list('zhanghang1989/ResNeSt')
+    model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=False)
+    num_features = model.fc.in_features
+    model.fc = torch.nn.Linear(num_features, 175, bias=True)
+    model.load_state_dict(torch.load(r"D:\Code\ML\Model\Card_cls2\resnest50_series01.pth"))
+
+    features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
+    model = torch.nn.Sequential(*features)
+
+    model2onnx(model, r"D:\Code\ML\Model\Card_cls2\resnest50_series01.onnx")
     print('end')

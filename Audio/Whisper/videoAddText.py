@@ -36,11 +36,17 @@ vad_param = {
     "speech_pad_ms": 2000
 }
 
-result = model.transcribe(audio_path, beam_size=5, word_timestamps=True,
+result = model.transcribe(audio_path,
+                          language='en',
+                          task="translate",
+
+                          beam_size=5,
+                          word_timestamps=True,
                           vad_filter=True,
-                          vad_parameters=vad_param,
-                          no_speech_threshold=0.2,
-                          max_initial_timestamp=9999999.0)
+                          # vad_parameters=vad_param,
+                          # no_speech_threshold=0.2,
+                          # max_initial_timestamp=9999999.0
+                          )
 segments, info = result
 
 print("Detected language '%s' with probability %f" % (info.language, info.language_probability))

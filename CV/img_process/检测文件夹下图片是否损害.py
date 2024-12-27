@@ -32,7 +32,7 @@ def check(img_path):
 
 
 if __name__ == '__main__':
-    img_paths = glob.glob(r"C:\Code\ML\Image\_SEGMENT\1986 Fleer Michael Jordan 57_psa_item_lots\*\*")
+    img_paths = glob.glob(r"D:\Code\ML\Image\_CLASSIFY\card_cls2\2023 panini card set\train\*\*")
     num = 0
     bad_num = 0
 

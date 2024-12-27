@@ -56,7 +56,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
         for phase in data_phase:
             if phase == 'train':
-                model.train()
+                model.test()
             else:
                 model.eval()
 
