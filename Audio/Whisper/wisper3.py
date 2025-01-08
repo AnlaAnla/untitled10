@@ -8,7 +8,7 @@ device = "cuda:0" if torch.cuda.is_available() else "cpu"
 torch_dtype = torch.float16 if torch.cuda.is_available() else torch.float32
 
 # model_id = "openai/whisper-large-v3"
-model_id = "openai/whisper-medium"
+model_id = "BELLE-2/Belle-whisper-large-v3-turbo-zh"
 
 model = AutoModelForSpeechSeq2Seq.from_pretrained(
     model_id, torch_dtype=torch_dtype, use_safetensors=True
@@ -30,11 +30,11 @@ pipe = pipeline(
     device=device,
 )
 
-generate_kwargs = {"task": "transcribe", "num_beams": 1}
+generate_kwargs = {"task": "transcribe", "num_beams": 5}
 # dataset = load_dataset("distil-whisper/librispeech_long", "clean", split="validation")
 # sample = dataset[0]["audio"]
 
-audio_path = r"D:\BaiduSyncdisk\t7.mp3"
+audio_path = r"D:\Code\ML\Audio\tomb.mp3"
 # result = pipe(audio_path, return_timestamps=True, generate_kwargs=generate_kwargs)
 result = pipe(audio_path, return_timestamps=True, generate_kwargs=generate_kwargs)
 

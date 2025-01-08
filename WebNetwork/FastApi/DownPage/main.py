@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 # 文件路径
-FILE_PATH = r"C:\Users\martin\Downloads\whisper_live.zip"  # 请替换为你要下载的文件路径
+FILE_PATH = r"C:\Users\martin\Downloads\212.txt"  # 请替换为你要下载的文件路径
 
 
 @app.get("/download")
