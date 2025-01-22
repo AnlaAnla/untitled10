@@ -1,8 +1,12 @@
 import gradio as gr
 import os
 
+# 指定临时文件夹路径
+gradio_temp_folder = "temp"
+os.makedirs(gradio_temp_folder, exist_ok=True)
+
 # 服务器文件路径（写死）
-server_file_path = "temp/whisper-larev3turbp_2025Y_01M_03D_15h_03m_46s-ct2.zip"
+server_file_path = "temp/212.txt"
 # 如果文件不存在，创建一个示例文件
 if not os.path.exists(server_file_path):
     with open(server_file_path, "w") as f:
@@ -67,4 +71,4 @@ with gr.Blocks(title="File Downloader & Uploader", theme=gr.themes.Soft()) as de
     download_button.click(download_file, outputs=gr.File(label="下载文件"))
     upload_button.click(upload_file, inputs=upload_file_input, outputs=upload_status_label)
 
-demo.launch(share=True)
+demo.launch(server_name='0.0.0.0', server_port=2345)

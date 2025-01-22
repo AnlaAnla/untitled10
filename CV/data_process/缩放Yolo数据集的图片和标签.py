@@ -66,7 +66,7 @@ def resize_image_and_labels(image_path, label_path, new_size=(1024, 1024)):
 
 # 保存调整后的图像和标签
 def save_image_and_labels(image, labels, image_path, label_path):
-    # cv2.imwrite(image_path, image)
+    cv2.imwrite(image_path, image)
     with open(label_path, 'w') as f:
         for label in labels:
             class_id = int(label[0])
@@ -107,10 +107,14 @@ def process_image_labels(source_dir, output_dir, new_size=(1024, 1024)):
 
         image_path = os.path.join(images_dir, image_name)
         label_path = os.path.join(labels_dir, label_name)
+        if not os.path.exists(label_path):
+            print("不存在: ", label_path)
+            continue
+
         output_image_path = os.path.join(output_images_dir, image_name)
         output_label_path = os.path.join(output_labels_dir, label_name)
 
-        resized_image, new_labels = resize_image_and_labels(image_path, label_path)
+        resized_image, new_labels = resize_image_and_labels(image_path, label_path, new_size=new_size)
 
         save_image_and_labels(resized_image, new_labels, output_image_path, output_label_path)
 
@@ -118,8 +122,10 @@ def process_image_labels(source_dir, output_dir, new_size=(1024, 1024)):
 
 
 if __name__ == '__main__':
-    process_image_labels(r"C:\Code\ML\Image\yolo_data02\Card_2box08\train_source",
-                         r"C:\Code\ML\Image\yolo_data02\Card_2box08\train")
+    # process_image_labels(r"C:\Code\ML\Image\yolo_data02\Card_2box08\train_source",
+    #                      r"C:\Code\ML\Image\yolo_data02\Card_2box08\train")
+
+    # ==================================================
     # image_path = 'path/to/your/image.jpg'
     # label_path = 'path/to/your/labels.txt'
     # resized_image, new_labels = resize_image_and_labels(image_path, label_path)
@@ -131,3 +137,8 @@ if __name__ == '__main__':
     # with open('new_labels.txt', 'w') as f:
     #     for label in new_labels:
     #         f.write(' '.join(map(str, label)) + '\n')
+
+
+    process_image_labels(r"D:\Code\ML\Image\_YOLO\Yolo_card_seg\Card_box_data\valid",
+                         r"D:\Code\ML\Image\_YOLO\Yolo_card_seg\Card_box_data640\valid",
+                         new_size=(640, 640))

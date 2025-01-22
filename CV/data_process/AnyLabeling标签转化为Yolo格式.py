@@ -33,9 +33,9 @@ def AnyLabeling2Yolo(Anylabeling_path):
 
             points = shape['points']
             x = (points[0][0]+points[1][0])/(2*imageWidth)
-            y = (points[0][1]+points[1][1])/(2*imageHeight)
+            y = (points[0][1]+points[2][1])/(2*imageHeight)
             width = abs(points[0][0]-points[1][0])/imageWidth
-            height = abs(points[0][1]-points[1][1])/imageHeight
+            height = abs(points[0][1]-points[2][1])/imageHeight
 
             yolo_label_one = f"{cls_id} {x} {y} {width} {height}"
             _yolo_label = _yolo_label + yolo_label_one + '\n'
@@ -46,12 +46,12 @@ def AnyLabeling2Yolo(Anylabeling_path):
 
 
 if __name__ == '__main__':
-    classes_path = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\classes.txt"
+    classes_path = r"D:\Code\ML\Image\_YOLO\yolo_card\classes.txt"
     classes = open(classes_path).read().splitlines()
     print(classes)
 
-    AnyLabels_dir = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\anylabels"
-    YoloLabels_save_dir = r"C:\Code\ML\Image\_YOLO\yolo_data03\Card_Pokemon_seg\labels"
+    AnyLabels_dir = r"D:\Code\ML\Image\_YOLO\yolo_card\label"
+    YoloLabels_save_dir = r"D:\Code\ML\Image\_YOLO\yolo_card\yolo_label"
 
     for AnyLabel_name in tqdm(os.listdir(AnyLabels_dir)):
         AnyLabel_path = os.path.join(AnyLabels_dir, AnyLabel_name)

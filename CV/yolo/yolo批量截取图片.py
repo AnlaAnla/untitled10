@@ -16,7 +16,7 @@ if __name__ == '__main__':
     #
     # for img_name in os.listdir(train_dir):
     #     img_path = os.path.join(train_dir, img_name)
-    img_paths = glob.glob(r"D:\Code\ML\Image\_CLASSIFY\card_cls2\2023 panini card set\train\*\*")
+    img_paths = glob.glob(r"D:\Code\ML\Image\_CLASSIFY\card_cls2\pre_data\*\*")
 
     img_num = 0
     for img_path in img_paths:

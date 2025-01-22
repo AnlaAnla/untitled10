@@ -71,15 +71,15 @@ def worker(image_paths, progress_queue, compress_func):
 
 if __name__ == '__main__':
 
-    image_paths = glob.glob(r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0806\images\*.jpg")
+    image_paths = glob.glob(r"D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224\*\*\*")
 
     # 创建一个队列来接收处理进度
     progress_queue = Queue()
 
     # 创建线程
-    num_threads = 4
+    num_threads = 3
     # 设置压缩方式
-    compress_partial = partial(resize_img, target_size=640)
+    compress_partial = partial(resize_img, target_size=224)
     # compress_partial = partial(compress_img, ratio=0.3)
     # compress_partial = partial(letterbox, target_size=1024)
 

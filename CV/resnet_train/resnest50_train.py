@@ -106,7 +106,7 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
 
         if (epoch + 1) % 10 == 0:
             print("save temp model in ", epoch + 1)
-            torch.save(model.state_dict(), 'card_resnet_temp.pth')
+            torch.save(model, 'card_resnet_temp.pt')
 
         print()
 
@@ -120,26 +120,22 @@ def train_model(model, criterion, optimizer, scheduler, num_epochs=25):
     return model
 
 
-def train(epoch=30, lr_rate=0.01, save_path='resnet.pth', load_my_model=False, model_path=None,
-          is_freeze=True, freeze_num=7, is_transfer_learn=False, transfer_cls=None):
+def train(epoch=30, lr_rate=0.01, save_path='resnet.pt', load_my_model=False, model_path=None,
+          is_freeze=True, freeze_num=7):
     # 如果不加载训练过的模型则加载预训练模型
     torch.hub.list('zhanghang1989/ResNeSt')
     if load_my_model:
-        # model = models.resnet50(pretrained=False)
-        model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=False)
-        num_features = model.fc.in_features
-        if is_transfer_learn:
-            # 加载旧模型后,更改为新模型的分类格式
-            model.fc = nn.Linear(num_features, transfer_cls, bias=True)
-            model.load_state_dict(torch.load(model_path))
+        model = torch.load(model_path)
+        old_cls_num = model.fc.out_features
 
-            # 修改最后一层
-            num_features = model.fc.in_features
-            model.fc = nn.Linear(num_features, class_num, bias=True)
+        if class_num == old_cls_num:
+            print('分类头相同, 训练')
         else:
+
+            num_features = model.fc.in_features
             # 修改最后一层
             model.fc = nn.Linear(num_features, class_num, bias=True)
-            model.load_state_dict(torch.load(model_path))
+            print(f"修改分类头: {old_cls_num} --> {class_num}")
 
     else:
         model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=True)
@@ -167,11 +163,11 @@ def train(epoch=30, lr_rate=0.01, save_path='resnet.pth', load_my_model=False, m
     model = train_model(model, criterion, optimizer_ft,
                         exp_lr_scheduler, num_epochs=epoch)
 
-    torch.save(model.state_dict(), save_path)
+    torch.save(model, save_path)
 
 
 if __name__ == '__main__':
-    data_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\Serices_cls_data_yolo224"
+    data_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224"
 
     # if platform.system() == 'Windows':
     #     print('这是Windows系统')
@@ -248,9 +244,8 @@ if __name__ == '__main__':
     data_phase = ['train', 'val']
     # 数据集路径在本文件上面
     train(epoch=20, lr_rate=0.01,
-          save_path=r'D:\Code\ML\Model\Card_cls2\resnest50_series01.pth',
-          load_my_model=False,
-          # model_path=r'D:\Code\ML\Model\Card_cls2\resnest50_02.pth',
-          # is_transfer_learn=True, transfer_cls=12796
+          save_path=r'D:\Code\ML\Model\Card_cls2\resnest50_series05.pt',
+          load_my_model=True,
+          model_path=r"D:\Code\ML\Model\Card_cls2\resnest50_series04.pt",
           )
 

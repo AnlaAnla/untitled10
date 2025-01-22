@@ -5,7 +5,7 @@ import os
 app = FastAPI()
 
 # 文件路径
-FILE_PATH = r"C:\Users\martin\Downloads\212.txt"  # 请替换为你要下载的文件路径
+FILE_PATH = r"D:\Code\ML\Image\_YOLO\Yolo_card_seg\Card_1-16.zip"  # 请替换为你要下载的文件路径
 
 
 @app.get("/download")

@@ -1,10 +1,8 @@
-import torch
+import numpy as np
 
+data = np.array([1, 2, 3, 4, 5, 6, 7, 8, 10, 9, 11, 3,2,1])
 
-torch.hub.list('zhanghang1989/ResNeSt')
-model = torch.hub.load('zhanghang1989/ResNeSt', 'resnest50', pretrained=False)
-num_features = model.fc.in_features
-model.fc = torch.nn.Linear(num_features, 100, bias=True)
-model.load_state_dict(torch.load(r"D:\Code\ML\Model\Card_cls2\resnest50_PaniniCard03.pth"))
+top_k = 3
 
-print(model)
+partitioned_indices = np.argpartition(data, -top_k)
+top_k_indices_arr = partitioned_indices[-top_k:][np.argsort(data[partitioned_indices[-top_k:]])][::-1]

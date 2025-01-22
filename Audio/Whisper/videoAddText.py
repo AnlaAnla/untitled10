@@ -18,7 +18,7 @@ model_size = r"D:\Code\ML\Model\Whisper\whisper-larev3turbp_2025Y_01M_03D_15h_03
 
 model = WhisperModel(model_size, device="cuda", compute_type="float16")
 
-audio_path = r"D:\Code\ML\Audio\0_2024Y_12M_30D_10h_56m_32s.mp3"
+audio_path = r"D:\Code\ML\Audio\test_audio01\tt601.mp3"
 # 加载视频文件
 # video = mp.VideoFileClip(r"D:\Code\ML\Video\card_video\2024_09_11 13_15_31.mp4")
 

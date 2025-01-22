@@ -44,9 +44,9 @@ def random_rename_img(img_dir_path):
 
 
 if __name__ == '__main__':
-    img_dir_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0812\images"
-    labels_dir_path = r"C:\Code\ML\Image\yolo_data02\Card_scratch01\pre_data\0812\labels"
+    img_dir_path = r"D:\Code\ML\Image\_YOLO\yolo_data02\POKEMON reflect\0719POKEMON 折射样本3\train"
+    labels_dir_path = r"D:\Code\ML\Image\_YOLO\yolo_data02\POKEMON reflect\0719POKEMON 折射样本3\labels"
 
-    rename_img_label(img_dir_path, labels_dir_path)
+    # rename_img_label(img_dir_path, labels_dir_path)
 
-    # random_rename_img(r"C:\Code\ML\Image\yolo_data02\Card_scratch\pokemon_not_scratch")
+    random_rename_img(r"D:\Code\ML\Image\_YOLO\Yolo_card_seg\Card_1-16\images")

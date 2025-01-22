@@ -39,30 +39,49 @@ def add_img2vector(img_path, img_name):
     print('添加向量: ', img_id, img_name)
 
 
-def search_img2vector(img_path: str):
+def search_img2vector(img, top_k:int=None):
+    '''
+
+        :param img:
+        :param top_k: 如果为None, 返回最大的, 如果有数字, 返回排行前 top_k的
+        :return:
+    '''
     global img_id, vec_data, name_list
 
-    output = onnxModel.run(img_path)
+    output = onnxModel.run(img)
     output = normalize_numpy(output)  # 归一化
 
     distances = np.apply_along_axis(cosine_similarity, 1, vec_data, output)
 
-    max_dis = np.max(distances)
-    search_name = name_list[np.argmax(distances)]
+    if top_k is None:
+        max_dis = np.max(distances)
+        search_name = name_list[np.argmax(distances)]
 
-    print(search_name, ': ', max_dis)
-    return search_name
+        print(search_name, ': ', max_dis)
+        return search_name
+    else:
+        search_names_dis = []
+        if len(distances) < top_k:
+            top_k = len(distances)
+
+        # 获取最相似的k个元素
+        partitioned_indices = np.argpartition(distances, -top_k)
+        top_k_indices_arr = partitioned_indices[-top_k:][np.argsort(distances[partitioned_indices[-top_k:]])][::-1]
+        for i in top_k_indices_arr:
+            search_names_dis.append([str(name_list[i]), float(distances[i])])
+        return search_names_dis
+
 
 
 if __name__ == '__main__':
-    onnxModel = MyOnnxModel(r"D:\Code\ML\Model\Card_cls2\resnest50_series01.onnx")
+    onnxModel = MyOnnxModel(r"D:\Code\ML\Model\Card_cls2\resnest50_series05.onnx")
     # vec_data = np.zeros((1, 960))
 
     # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
     vec_data = np.zeros((1, 2048))
 
-    data_dir = r'D:\Code\ML\Image\_CLASSIFY\card_cls2\Serices_cls_data_yolo224\val'
-    val_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\Serices_cls_data_yolo224\train"
+    data_dir = r'D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224\val'
+    val_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224\train"
 
     name_list = ['background']
 
