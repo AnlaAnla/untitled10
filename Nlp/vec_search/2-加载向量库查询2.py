@@ -10,11 +10,11 @@ def cosine_similarity(vec1, vec2):
     norm_vec1 = np.linalg.norm(vec1)  # norm_vec1 shape: (1,)
     norm_vec2 = np.linalg.norm(vec2, axis=1, keepdims=True)  # norm_vec2 shape: (807566, 1)
     similarities = dot_product / (
-                norm_vec1 * norm_vec2)  # dot_product 和 (norm_vec1 * norm_vec2) 都是 (807566, 1), 可以直接做除法
+            norm_vec1 * norm_vec2)  # dot_product 和 (norm_vec1 * norm_vec2) 都是 (807566, 1), 可以直接做除法
     return similarities.flatten()
 
 
-def search_vec2text(text, alpha=0.2, top_k: int = None):
+def search_vec2text(text, alpha=0.5, top_k: int = None):
     """
     :param text: 查询的文本。
     :param alpha: 长度惩罚系数。
@@ -62,5 +62,5 @@ if __name__ == '__main__':
     print('加载向量库和名称库')
 
     # 示例
-    search_vec2text("prizm base coby white", top_k=5)
+    search_vec2text("Beux Collins 2023 Bowman Chrome University #90 Purple Refractor /399 1st", alpha=0.3, top_k=5)
     print()

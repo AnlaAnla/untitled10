@@ -2,6 +2,7 @@ from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
 
+
 def cosine_similarity(vec1, vec2):
     """计算两个向量的余弦相似度（vec1 为单个向量，vec2 可以是向量集合）。"""
     vec1 = vec1.reshape(1, -1)  # 确保 vec1 是行向量
@@ -10,6 +11,7 @@ def cosine_similarity(vec1, vec2):
     norm_vec2 = np.linalg.norm(vec2, axis=1, keepdims=True)
     similarities = dot_product / (norm_vec1 * norm_vec2)
     return similarities.flatten()
+
 
 def search_vec2text(text, alpha=0.2, top_k: int = None):
     """
@@ -49,6 +51,7 @@ def search_vec2text(text, alpha=0.2, top_k: int = None):
             print(item)
         return search_names_dis
 
+
 def add_text2vector(batch_texts):
     global text_id, vec_data_list, name_list  # 使用列表 vec_data_list
 
@@ -58,6 +61,7 @@ def add_text2vector(batch_texts):
     name_list.extend(batch_texts)
     vec_data_list.extend(output_vecs.tolist())  # 将向量添加到列表中
     print(f"添加向量: {text_id - len(batch_texts) + 1} 到 {text_id}")
+
 
 if __name__ == '__main__':
     # 加载模型
