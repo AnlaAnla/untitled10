@@ -13,7 +13,7 @@ def cosine_similarity(vec1, vec2):
     return similarities.flatten()
 
 
-def search_vec2text(text, alpha=0.2, top_k: int = None):
+def search_vec2text(text, alpha=0, top_k: int = None):
     """
     :param text: 查询的文本。
     :param alpha: 长度惩罚系数。
@@ -21,14 +21,15 @@ def search_vec2text(text, alpha=0.2, top_k: int = None):
     """
     global text_id, vec_data, name_list
 
-    output_vec = model.encode(text).reshape(1, -1)
+    output_vec = model.encode(text, normalize_embeddings=True).reshape(1, -1)
 
     # 使用改进后的 cosine_similarity 函数
     similarities = cosine_similarity(output_vec, vec_data)
 
     # 引入长度惩罚
-    for i, name in enumerate(name_list):
-        similarities[i] *= (1 - alpha * abs(len(text) - len(name)) / max(len(text), len(name)))
+    if alpha != 0:
+        for i, name in enumerate(name_list):
+            similarities[i] *= (1 - alpha * abs(len(text) - len(name)) / max(len(text), len(name)))
 
     if top_k is None:
         max_dis = np.max(similarities)
@@ -55,7 +56,7 @@ def search_vec2text(text, alpha=0.2, top_k: int = None):
 def add_text2vector(batch_texts):
     global text_id, vec_data_list, name_list  # 使用列表 vec_data_list
 
-    output_vecs = model.encode(batch_texts)  # 批量生成向量
+    output_vecs = model.encode(batch_texts, normalize_embeddings=True)  # 批量生成向量
 
     text_id += len(batch_texts)
     name_list.extend(batch_texts)
@@ -65,32 +66,40 @@ def add_text2vector(batch_texts):
 
 if __name__ == '__main__':
     # 加载模型
-    model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    # model = SentenceTransformer('BAAI/bge-large-en-v1.5')
 
     vec_data_list = []  # 初始化为空列表
     name_list = []
     text_id = 0
 
     # 开始存储向量
-    data = pd.read_csv(r"D:\Code\ML\Text\test\paniniamerica_checklist_refresh.csv")
-    print('length: ', len(data))
+    data_path = r"D:\Code\ML\Text\checklist_tags\program_tags.txt"
+    data_list = []
+    with open(data_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            tag = line.strip()
+            if tag:  # 排除空行
+                data_list.append(tag)
+    print('length: ', len(data_list))
 
     batch_size = 1000
     for i in range(0, 2000, batch_size):
-        batch_texts = data["bgs_title"][i:i + batch_size].tolist()
+        batch_texts = data_list[i:i + batch_size]
         add_text2vector(batch_texts)
 
     # 将 vec_data_list 转换为 NumPy 数组
     vec_data = np.array(vec_data_list)
 
-    np.save("temp/vec_data_text02.npy", vec_data)
-    np.save("temp/vec_data_text02_names.npy", np.array(name_list))  # 也将 name_list 转换为 NumPy 数组
+    np.save("temp/program_vec.npy", vec_data)
+    np.save("temp/program_vec_names.npy", np.array(name_list))  # 也将 name_list 转换为 NumPy 数组
     print('向量库建立完成')
 
     # 加载向量和名称进行测试
-    vec_data = np.load("temp/vec_data_text02.npy")
-    name_list = np.load("temp/vec_data_text02_names.npy")
+    vec_data = np.load("temp/program_vec.npy")
+    name_list = np.load("temp/program_vec_names.npy")
     print('加载向量库和名称库')
 
     # 示例
-    search_vec2text("prizm base coby white", top_k=5)
+    search_vec2text("2021-22 Panini Select Franz Wagner Concourse Rookie RC #15 Orlando Magic", top_k=10)
+    print()

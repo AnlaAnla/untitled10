@@ -1,6 +1,7 @@
 from sentence_transformers import SentenceTransformer
 import numpy as np
 import pandas as pd
+import time
 
 
 def cosine_similarity(vec1, vec2):
@@ -14,7 +15,7 @@ def cosine_similarity(vec1, vec2):
     return similarities.flatten()
 
 
-def search_vec2text(text, alpha=0.5, top_k: int = None):
+def search_vec2text(text, alpha=0, top_k: int = None):
     """
     :param text: 查询的文本。
     :param alpha: 长度惩罚系数。
@@ -22,14 +23,15 @@ def search_vec2text(text, alpha=0.5, top_k: int = None):
     """
     global text_id, vec_data, name_list
 
-    output_vec = model.encode(text).reshape(1, -1)
+    output_vec = model.encode(text, normalize_embeddings=True).reshape(1, -1)
 
     # 使用改进后的 cosine_similarity 函数
     similarities = cosine_similarity(output_vec, vec_data)
 
     # 引入长度惩罚
-    for i, name in enumerate(name_list):
-        similarities[i] *= (1 - alpha * abs(len(text) - len(name)) / max(len(text), len(name)))
+    if alpha != 0:
+        for i, name in enumerate(name_list):
+            similarities[i] *= (1 - alpha * abs(len(text) - len(name)) / max(len(text), len(name)))
 
     if top_k is None:
         max_dis = np.max(similarities)
@@ -55,12 +57,19 @@ def search_vec2text(text, alpha=0.5, top_k: int = None):
 
 if __name__ == '__main__':
     # 加载模型
-    model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    # model = SentenceTransformer('BAAI/bge-large-en-v1.5')
 
-    vec_data = np.load("temp/vec_data_text01.npy")
-    name_list = np.load("temp/vec_data_text01_names.npy")
+    # vec_data = np.load("temp/cardSet_vec.npy")
+    # name_list = np.load("temp/cardSet_vec_names.npy")
+    # vec_data = np.load("temp/program_vec.npy")
+    # name_list = np.load("temp/program_vec_names.npy")
+    vec_data = np.load("temp/athlete_vec.npy")
+    name_list = np.load("temp/athlete_vec_names.npy")
     print('加载向量库和名称库')
 
+    t1 = time.time()
     # 示例
-    search_vec2text("Beux Collins 2023 Bowman Chrome University #90 Purple Refractor /399 1st", alpha=0.3, top_k=5)
+    search_vec2text("Karl Malone 2023-24 Panini Mosaic #297 Base Set NBA Greats Utah Jazz", alpha=0, top_k=5)
+    print('time cost:', time.time() - t1)
     print()

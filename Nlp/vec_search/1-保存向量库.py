@@ -16,7 +16,7 @@ def cosine_similarity(vec1, vec2):
 def add_text2vector(batch_texts):
     global text_id, vec_data_list, name_list  # 使用列表 vec_data_list
 
-    output_vecs = model.encode(batch_texts)  # 批量生成向量
+    output_vecs = model.encode(batch_texts, normalize_embeddings=True)  # 批量生成向量
 
     text_id += len(batch_texts)
     name_list.extend(batch_texts)
@@ -24,27 +24,49 @@ def add_text2vector(batch_texts):
     print(f"添加向量: {text_id - len(batch_texts) + 1} 到 {text_id}")
 
 
-if __name__ == '__main__':
-
-    # 加载模型
-    model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
-
+def process_text(data_path, save_name):
+    global text_id, vec_data_list, name_list  # 使用列表 vec_data_list
     vec_data_list = []  # 初始化为空列表
     name_list = []
     text_id = 0
 
     # 开始存储向量
-    data = pd.read_csv(r"D:\Code\ML\Text\test\paniniamerica_checklist_refresh.csv")
-    print('length: ', len(data))
+    # data_path = r"D:\Code\ML\Text\checklist_tags\cardSet_tags.txt"
+    data_list = []
+    with open(data_path, 'r', encoding='utf-8') as f:
+        for line in f:
+            tag = line.strip()
+            if tag:  # 排除空行
+                data_list.append(tag)
+    print('length: ', len(data_list))
 
-    batch_size = 8000  # 设置 batch size
-    for i in range(0, len(data), batch_size):
-        batch_texts = data["bgs_title"][i:i + batch_size].tolist()
+    batch_size = 8000
+    for i in range(0, len(data_list), batch_size):
+        batch_texts = data_list[i:i + batch_size]
         add_text2vector(batch_texts)
 
     # 将 vec_data_list 转换为 NumPy 数组
     vec_data = np.array(vec_data_list)
 
-    np.save("temp/vec_data_text02.npy", vec_data)
-    np.save("temp/vec_data_text02_names.npy", np.array(name_list))  # 也将 name_list 转换为 NumPy 数组
-    print('向量库建立完成')
+    np.save(f"temp/{save_name}_vec.npy", vec_data)
+    np.save(f"temp/{save_name}_vec_names.npy", np.array(name_list))  # 也将 name_list 转换为 NumPy 数组
+    print(f'{save_name} 向量库建立完成')
+
+    vec_data_list = []  # 初始化为空列表
+    name_list = []
+    text_id = 0
+
+if __name__ == '__main__':
+    vec_data_list = []  # 初始化为空列表
+    name_list = []
+    text_id = 0
+
+    # 加载模型
+    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    # model = SentenceTransformer('BAAI/bge-large-en-v1.5')
+
+    # process_text(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", save_name="program")
+    process_text(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt", save_name="cardSet")
+    # process_text(r"D:\Code\ML\Text\checklist_tags\2023\athlete.txt", save_name="athlete")
+
+

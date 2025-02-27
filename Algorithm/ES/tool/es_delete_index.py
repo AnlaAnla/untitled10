@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 # 连接到 Elasticsearch (请根据你的 ES 配置修改)
 es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
 
-index_name = "cards"
+index_name = "card_set_index"
 
 if es.indices.exists(index=index_name):
     try:

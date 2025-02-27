@@ -14,7 +14,7 @@ def search_vec2text(text, top_k:int=None):
     """
     global text_id, vec_data, name_list
 
-    output_vec = model.encode(text).reshape(1, -1)
+    output_vec = model.encode(text, normalize_embeddings=True).reshape(1, -1)
     distances = np.apply_along_axis(cosine_similarity, 1, vec_data, output_vec)
 
     if top_k is None:

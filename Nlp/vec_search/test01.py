@@ -1,24 +1,14 @@
-import numpy as np
+from sentence_transformers import SentenceTransformer
 
-# 加载向量库和名称库
-vec_data = np.load("temp/vec_data_text01.npy")
-name_list = np.load("temp/vec_data_text01_names.npy")
-print('加载向量库和名称库')
+model = SentenceTransformer("nomic-ai/nomic-embed-text-v2-moe", trust_remote_code=True)
+sentences = ["2023-24 Panini Mosaic Mosaic Reactive Blue #289 Tyrese Haliburton City Edition!", "Base Mosaic Reactive Blue"]
 
-# 检查第一个向量是否为零向量
-if np.all(vec_data[0] == 0):
-    print("移除第一个零向量...")
-    # 移除第一个向量
-    vec_data = vec_data[1:]
-    # 移除对应的名称
-    name_list = name_list[1:]
+embedding1 = model.encode(sentences[0], prompt_name="passage", normalize_embeddings=True)
+embedding2 = model.encode(sentences[1], prompt_name="query", normalize_embeddings=True)
 
-    # 保存修改后的向量库和名称库
-    np.save("temp/vec_data_text01.npy", vec_data)
-    np.save("temp/vec_data_text01_names.npy", name_list)
-    print("已移除零向量并更新文件")
-else:
-    print("第一个向量不是零向量，无需移除")
+print(embedding1.shape)
+# (2, 768)
 
-print("vec_data shape:", vec_data.shape)
-print("name_list length:", len(name_list))
+similarity = model.similarity(embedding1, embedding2)
+print(similarity)
+# tensor([[0.9118]])
