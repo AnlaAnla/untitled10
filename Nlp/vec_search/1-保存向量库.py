@@ -62,11 +62,11 @@ if __name__ == '__main__':
     text_id = 0
 
     # 加载模型
-    model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_cardSet4")
     # model = SentenceTransformer('BAAI/bge-large-en-v1.5')
 
-    # process_text(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", save_name="program")
+    process_text(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", save_name="program")
     process_text(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt", save_name="cardSet")
-    # process_text(r"D:\Code\ML\Text\checklist_tags\2023\athlete.txt", save_name="athlete")
+    process_text(r"D:\Code\ML\Text\checklist_tags\2023\athlete.txt", save_name="athlete")
 
 
