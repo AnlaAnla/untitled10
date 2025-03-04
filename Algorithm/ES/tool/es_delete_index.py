@@ -3,7 +3,7 @@ from elasticsearch import Elasticsearch
 # 连接到 Elasticsearch (请根据你的 ES 配置修改)
 es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
 
-index_name_list = ["program_index", "card_set_index", "athlete_index"]
+index_name_list = ["2023_program_index", "2023_card_set_index", "2023_athlete_index"]
 
 for index_name in index_name_list:
     if es.indices.exists(index=index_name):

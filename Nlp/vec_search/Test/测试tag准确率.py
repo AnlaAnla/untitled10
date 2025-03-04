@@ -60,16 +60,16 @@ def test_accuracy(batch_results):
     for result in batch_results:
         print(f"[{result['query']}] : [{result['match_tag']}]")
 
-        for i, (name, _) in enumerate(result['top_k_results']):
+        for i, (name, score) in enumerate(result['top_k_results']):
             if result['match_tag'].lower().strip() == name.lower().strip():
                 top_n[i] += 1
                 if i == 0:
-                    print(f"Top1 💖 : {name}")
+                    print(f"Top1 💖 : {name} [{score}]")
                 else:
-                    print(f"Top{i + 1} ❤ : {name}")
+                    print(f"Top{i + 1} ❤ : {name} [{score}]")
                 break
 
-            print(f"--{name}")
+            print(f"--{name} [{score}]")
             if i == 4:
                 print('❌')
 

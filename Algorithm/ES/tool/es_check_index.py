@@ -18,3 +18,5 @@ for index_name, alias_info in response.items():
             print(f"    - {alias_name}")
     else:
         print("No aliases")
+
+print('end')

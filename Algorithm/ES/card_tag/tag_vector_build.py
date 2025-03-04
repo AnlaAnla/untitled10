@@ -32,7 +32,7 @@ def create_index(es_client, index_name):
                         "type": "dense_vector",
                         "dims": VECTOR_DIMENSION,
                         "index": "true",  # 使用默认的 HNSW 索引
-                        "similarity": "cosine"  # 余弦相似度
+                        "similarity": "dot_product"
                     },
                     "name": {"type": "keyword"},
                     "text_id": {"type": "integer"}  # 可选
@@ -90,10 +90,10 @@ def vector_search(es_client, index_name, query_vector, top_k=5):
         "size": top_k,
         "query": {
             "knn": {  # 使用kNN
-                "embedding": {
-                    "vector": query_vector.tolist(),  # 查询向量
-                    "k": top_k
-                }
+                "field": "embedding",  # 关键修改： 使用 'field' 参数指定字段名
+                "query_vector": query_vector.tolist(),  # 查询向量
+                "k": top_k,
+                "num_candidates": 50  # 增加候选项
             }
         }
     }
@@ -126,9 +126,9 @@ def batch_vector_search(es_client, index_name, query_texts, top_k=5):
 
 if __name__ == '__main__':
     # 将数据索引到 Elasticsearch
-    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", "program_index")
-    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt", "card_set_index")
-    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\athlete.txt", "athlete_index")
+    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", "2023_program_index")
+    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt", "2023_card_set_index")
+    process_and_index(r"D:\Code\ML\Text\checklist_tags\2023\athlete.txt", "2023_athlete_index")
 
     # # 示例：单个向量搜索
     # query_text = "some query text"
