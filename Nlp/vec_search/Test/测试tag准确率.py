@@ -76,10 +76,10 @@ def test_accuracy(batch_results):
         print()
 
     for i in range(1, len(top_n)):
-        top_n[i] = top_n[i] + top_n[i-1]
+        top_n[i] = top_n[i] + top_n[i - 1]
 
     for i in range(len(top_n)):
-        print(f"Top {i+1} accuracy: {top_n[i] / data_length * 100:.2f}%, {top_n[i]}/{data_length}")
+        print(f"Top {i + 1} accuracy: {top_n[i] / data_length * 100:.2f}%, {top_n[i]}/{data_length}")
 
 
 def test_tag(tag, tag_vec_name):
@@ -99,23 +99,13 @@ def test_tag(tag, tag_vec_name):
     print(f"----------- {tag} --------------")
 
 
-
 if __name__ == '__main__':
     # 加载微调后的模型
-    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_cardSet4")
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5")
 
-    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test.xlsx")
+    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
     ebay_text_list = test_data["ebay_text"]
 
-    test_tag("program", "program")
+    # test_tag("program", "program")
     test_tag("card_set", "cardSet")
-    test_tag("athlete", "athlete")
-
-
-
-
-
-
-
-
-
+    # test_tag("athlete", "athlete")

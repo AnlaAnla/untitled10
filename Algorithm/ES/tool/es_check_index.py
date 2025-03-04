@@ -17,4 +17,4 @@ for index_name, alias_info in response.items():
         for alias_name in alias_info['aliases']:
             print(f"    - {alias_name}")
     else:
-        print("  No aliases")
+        print("No aliases")

@@ -9,7 +9,7 @@ os.environ["WANDB_DISABLED"] = "true"
 
 # 加载模型
 # model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_cardSet3")
+model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5")
 
 # 定义损失函数
 train_loss = losses.MultipleNegativesRankingLoss(model)
@@ -28,15 +28,15 @@ train_data = [
 # val_data = [InputExample(texts=[row['ebay_text'], row['card_set']]) for _, row in val_df.iterrows()]
 
 # 创建数据加载器
-train_dataloader = DataLoader(train_data, shuffle=True, batch_size=256)
+train_dataloader = DataLoader(train_data, shuffle=True, batch_size=128)
 # val_dataloader = DataLoader(val_data, shuffle=False, batch_size=32)
 
 # 训练模型
 model.fit(train_objectives=[(train_dataloader, train_loss)],
-          epochs=25,
+          epochs=10,
           warmup_steps=100,
           optimizer_params={'lr': 2e-5},
           )
 
 # 保存模型
-model.save(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_cardSet4")
+model.save(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5")
