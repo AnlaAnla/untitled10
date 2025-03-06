@@ -1,46 +1,73 @@
-from elasticsearch import Elasticsearch
+import re
+import pandas as pd
 
-es = Elasticsearch([{'host': 'localhost', 'port': 9200, 'scheme': 'http'}])
+def preprocess_year_num(text:str):
+    # 尝试匹配 "20xx-yy"、"20xx" 或 "xx-yy" 格式的年份
+    year_match = re.search(r'\b(20\d{2})-(\d{2})\b|\b(20\d{2})\b|\b(\d{2})-(\d{2})\b', text)
 
+    year = ""
+    if year_match:
+        if year_match.group(1):
+            year = year_match.group(1)
+        elif year_match.group(3):
+            year = year_match.group(3)
+        elif year_match.group(4):
+            year = "20" + year_match.group(4)
+            if int(year) > 2099 or int(year) < 2000:
+                year = ""
 
-def es_fuzzy_search(es_client, index_name, field_name, query, fuzziness="AUTO", query_type="match"):
-    """
-    在 ES 中进行模糊搜索，可以指定查询类型 (match 或 match_phrase)
-    """
-    if query_type == "match_phrase":
-        search_query = {
-            "match_phrase": {
-                field_name: {
-                    "query": query,
-                    "slop": 2,  # 允许最多 2 个单词的间隔 (可以理解为词序错乱或中间插入单词)
-                }
-            }
-        }
-    else:  # 默认使用 match 查询
-        search_query = {
-            "match": {
-                field_name: {
-                    "query": query,
-                    "fuzziness": fuzziness,
-                    "prefix_length": 2
-                }
-            }
-        }
+    card_num = ""
+    word_list = text.lower().split()
+    if 'base' in word_list or 'rookie' in word_list or 'rc' in word_list:
+        num_match = re.search(r'#([A-Za-z0-9/-]+)', text)  # 修改的正则
+        if num_match:
+            card_num_part = num_match.group(1)
+            if "/" in card_num_part:  # 首先检查是否有斜杠
+                card_num = ""
+            elif "-" in card_num_part:
+                parts = card_num_part.split("-")
+                if all(part.isdigit() for part in parts):
+                    card_num = parts[0]
+                else:
+                    card_num = card_num_part
+            else:
+                card_num = card_num_part
+    else:
+        card_num = ""
 
-    res = es_client.search(index=index_name, query=search_query)
-    hits = res['hits']['hits']
-    if hits:
-        return hits[0]['_source'][field_name], hits[0]['_score']  # 返回最佳匹配的标签和分数
-    return None, 0.0
+    return {
+        'year': year,
+        'card_num': card_num
+    }
 
-program_index_name = "program_index"
-card_set_index_name = "card_set_index"
-athlete_index_name = "athlete_index"
+test_data = pd.read_excel("D:\Code\ML\Text\embedding\ebay_2023_data01.xlsx")
+length = len(test_data)
 
-# 2020 Panini Contenders Draft Picks #77 Noah Fent Iowa hawkeyes football card
-# 模型输出:  {'year': '2020', 'program': 'Contenders Draft Picks', 'card_set': '#77', 'card_num': '', 'athlete': 'Noah Fent'}
+yes_year = 0
+yes_num = 0
 
-text = "#77"
-# print(program_index_name, es_fuzzy_search(es, index_name=program_index_name, field_name='program', query=text))
-print(card_set_index_name, es_fuzzy_search(es, index_name=card_set_index_name, field_name='card_set', query=text))
-# print(athlete_index_name, es_fuzzy_search(es, index_name=athlete_index_name, field_name='athlete', query=text, query_type="match_phrase"))
+not_card_num = 0
+
+for row in test_data.iterrows():
+
+    year_num = preprocess_year_num(row[1]['ebay_text'])
+
+    if year_num['year'] == str(row[1]['year']):
+        yes_year += 1
+
+    if year_num['card_num'] == '' or not year_num['card_num'].isdigit():
+        not_card_num += 1
+    elif year_num['card_num'] == str(row[1]['card_number']):
+        yes_num += 1
+    else:
+        print(f"{row[1]['ebay_text']} [{row[1]['card_number']}]")
+        print(year_num['card_num'])
+        print()
+
+print(f" {yes_year/length} [{yes_year}/{length}]")
+
+print(f"yes num: {yes_num}")
+print(f" not num: {not_card_num}")
+print(f" {yes_num/length} [{yes_num}/{length}]")
+print(f" {yes_num/(length-not_card_num)} [{yes_num}/{length - not_card_num}]")
+

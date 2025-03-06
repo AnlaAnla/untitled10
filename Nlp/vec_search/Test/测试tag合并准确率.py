@@ -72,7 +72,7 @@ def load_vec_data(tag_vec_name):
 
 if __name__ == '__main__':
     # 加载微调后的模型
-    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5")
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")
 
     test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
     ebay_text_list = test_data["ebay_text"]

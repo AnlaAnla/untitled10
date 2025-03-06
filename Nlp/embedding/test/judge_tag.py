@@ -14,9 +14,10 @@ def get_data_list(data_path):
 
 
 if __name__ == '__main__':
-    match_ebay_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01.xlsx")
+    match_ebay_data = pd.read_excel(r"D:\Code\ML\Text\embedding\combined_test_data.xlsx")
 
-    # match_tag = list(match_ebay_data['athlete'].dropna().unique())
+    # match_tag = list(match_ebay_data['card_set'].dropna().unique())
+    # card_set_database = get_data_list(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt")
     #
     # for tag in match_tag:
     #     if tag not in card_set_database:

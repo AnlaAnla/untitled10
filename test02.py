@@ -1,49 +1,48 @@
-import pandas as pd
-import numpy as np
-from thefuzz import fuzz, process
+import re
+
+def preprocess_year_num(text):
+    # 尝试匹配 "20xx-yy"、"20xx" 或 "xx-yy" 格式的年份
+    year_match = re.search(r'\b(20\d{2})-(\d{2})\b|\b(20\d{2})\b|\b(\d{2})-(\d{2})\b', text)
+    num_match = re.search(r'#([A-Za-z0-9/-]+)', text)  # 修改的正则
+
+    year = ""
+    if year_match:
+        if year_match.group(1):
+            year = year_match.group(1)
+        elif year_match.group(3):
+            year = year_match.group(3)
+        elif year_match.group(4):
+            year = "20" + year_match.group(4)
+            if int(year) > 2099 or int(year) < 2000:
+                year = ""
+
+    card_num = ""
+    if num_match:
+        card_num_part = num_match.group(1)
+        if "/" in card_num_part:  # 首先检查是否有斜杠
+            card_num = ""
+        elif "-" in card_num_part:
+            parts = card_num_part.split("-")
+            if all(part.isdigit() for part in parts):
+                card_num = parts[0]
+            else:
+                card_num = card_num_part
+        else:
+            card_num = card_num_part
+
+    return {
+        'year': year,
+        'card_num': card_num
+    }
 
 
-def filter_dataframe_optimized(dataframe, filter_dict):
-    """
-    根据给定的字典中的字段筛选 DataFrame
-
-    Args:
-        dataframe: 要筛选的 Pandas DataFrame。
-        filter_dict: 包含筛选条件的字典。键是 DataFrame 的列名，值是筛选条件。
-                     支持的键: 'program_new', 'card_num', 'athlete_new'
-                     如果值为 None 或空字符串，则忽略该筛选条件。
-                     如果键是 'card_num' 且值不是纯数字字符串，则忽略。
-
-    Returns:
-        筛选后的 DataFrame。
-    """
-
-    mask = True  # 初始 mask 为 True
-
-    for column, value in filter_dict.items():
-        if not value:  # 等价于 if value is None or value == "":
-            continue
-
-        if column == 'card_num':
-            if not isinstance(value, str) or not value.isdigit():
-                continue
-            value = str(value)  # card_num 转为字符串
-        elif column not in ('program_new', 'athlete_new'):  # 优化点1
-            continue
-
-        if column in dataframe.columns:  # 优化点2
-            mask = mask & (dataframe[column] == value)
-
-    return dataframe[mask]
-
-
-checklist_2023 = pd.read_csv(r"D:\Code\ML\Text\card\checklist_2023.csv")
-output = {'program_new': 'Prizm', 'card_num': '28', 'athlete_new': 'Stephen Curry'}
-
-filtered_name_data = list(filter_dataframe_optimized(checklist_2023, output)['card_set'])
-print(filtered_name_data)
-
-matches = process.extract("2023-24 Prizm Monopoly Stephen Curry SILVER Prizm Card #28 Warriors Star!", filtered_name_data, scorer=fuzz.partial_ratio, limit=20)
-print(matches)
-
-print()
+# 测试用例
+print(preprocess_year_num("2023-24 #123"))
+print(preprocess_year_num("2024 #456"))
+print(preprocess_year_num("23-24 #ABC"))
+print(preprocess_year_num("#046/100"))
+print(preprocess_year_num("#1-7"))
+print(preprocess_year_num("#XYZ-abc"))
+print(preprocess_year_num("#12-34-56"))
+print(preprocess_year_num("2021 #A1-B2"))
+print(preprocess_year_num("#AbC-123"))

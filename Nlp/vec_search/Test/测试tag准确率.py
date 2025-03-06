@@ -101,11 +101,13 @@ def test_tag(tag, tag_vec_name):
 
 if __name__ == '__main__':
     # 加载微调后的模型
-    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5")
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6")
 
     test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
-    ebay_text_list = test_data["ebay_text"]
+    # ebay_text_list = test_data["ebay_text"]
+    ebay_text_list = ["2023-24 Donruss Elite Derrick Jones Jr. /10 Gold Foil SSP #53. Dallas Mavericks"]
 
-    # test_tag("program", "program")
+    test_tag("athlete", "athlete")
+    test_tag("program", "program")
     test_tag("card_set", "cardSet")
-    # test_tag("athlete", "athlete")
+

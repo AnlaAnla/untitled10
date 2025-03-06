@@ -136,6 +136,8 @@ def test_combined_accuracy(model, test_data, index_name_list, top_k_per_index):
         combined_results = combine_results(all_results)
 
         # 测试前n个的准确数量
+        print(f"{test_data['ebay_text'].iloc[i]} "
+              f"[{test_data["program"].iloc[i]}, {test_data["card_set"].iloc[i]}, {test_data["athlete"].iloc[i]}]")
 
         for j in range(5):
             this_combination = combined_results[j] if combined_results else None
@@ -147,7 +149,7 @@ def test_combined_accuracy(model, test_data, index_name_list, top_k_per_index):
                     this_combination["athlete"].lower().strip() == test_data["athlete"].iloc[i].lower().strip()
             ):
                 top_n_yes[j] += 1
-                print(f"💖 Top {j+1}: {this_combination}")
+                print(f"💖 Top {j + 1}: {this_combination}")
                 break
             else:
                 print(f"--{this_combination}")
@@ -161,30 +163,30 @@ def test_combined_accuracy(model, test_data, index_name_list, top_k_per_index):
 
     for i in range(max_combinations):
         accuracy = top_n_yes[i] / test_data_length * 100
-        print(f"Top {i+1} Accuracy: {accuracy:.2f}% ({top_n_yes[i]}/{test_data_length})")
+        print(f"Top {i + 1} Accuracy: {accuracy:.2f}% ({top_n_yes[i]}/{test_data_length})")
 
 
 if __name__ == '__main__':
     # SentenceTransformer 模型路径
-    model_path = r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5"
+    model_path = r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6"
     model = SentenceTransformer(model_path)
 
     index_name_list = ["2023_program_index", "2023_card_set_index", "2023_athlete_index"]
-    top_k_per_index = 5  # 每个索引返回的前 k 个结果
+    top_k_per_index = 3  # 每个索引返回的前 k 个结果
     max_combinations = 5  # 最大组合数量
 
-    # test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
-    # test_combined_accuracy(model, test_data, index_name_list, top_k_per_index)
+    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
+    test_combined_accuracy(model, test_data, index_name_list, top_k_per_index)
 
     # 测试单个案例
-    ebay_text = "2023-24 Panini Mosaic #6 Stephen Curry Elevate Mosaic Green Warriors"
-    query_vector = model.encode(ebay_text, normalize_embeddings=True, convert_to_numpy=True)
-    all_results = []
-    for index_name in index_name_list:
-        single_search_results = vector_search_script_score(es, index_name, query_vector,
-                                                           top_k=top_k_per_index)
-        all_results.append(single_search_results)
-    combined_results = combine_results(all_results, top_k_combined=5)
-
-    print(combined_results)
-    print()
+    # ebay_text = "2023-24 Panini Mosaic #6 Stephen Curry Elevate Mosaic Green Warriors"
+    # query_vector = model.encode(ebay_text, normalize_embeddings=True, convert_to_numpy=True)
+    # all_results = []
+    # for index_name in index_name_list:
+    #     single_search_results = vector_search_script_score(es, index_name, query_vector,
+    #                                                        top_k=top_k_per_index)
+    #     all_results.append(single_search_results)
+    # combined_results = combine_results(all_results, top_k_combined=5)
+    #
+    # print(combined_results)
+    # print()
