@@ -62,8 +62,8 @@ if __name__ == '__main__':
     text_id = 0
 
     # 加载模型
-    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6")
-    # model = SentenceTransformer('BAAI/bge-large-en-v1.5')
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")
+
 
     process_text(r"D:\Code\ML\Text\checklist_tags\2023\program.txt", save_name="program")
     process_text(r"D:\Code\ML\Text\checklist_tags\2023\card_set.txt", save_name="cardSet")

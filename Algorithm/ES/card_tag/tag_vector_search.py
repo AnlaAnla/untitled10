@@ -172,10 +172,10 @@ if __name__ == '__main__':
     model = SentenceTransformer(model_path)
 
     index_name_list = ["2023_program_index", "2023_card_set_index", "2023_athlete_index"]
-    top_k_per_index = 3  # 每个索引返回的前 k 个结果
+    top_k_per_index = 5  # 每个索引返回的前 k 个结果
     max_combinations = 5  # 最大组合数量
 
-    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
+    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test3.xlsx")
     test_combined_accuracy(model, test_data, index_name_list, top_k_per_index)
 
     # 测试单个案例

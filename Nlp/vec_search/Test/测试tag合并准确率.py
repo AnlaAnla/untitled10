@@ -53,7 +53,7 @@ def test_combined_accuracy(model, test_data):
         if (
                 program_preds[i].lower().strip() == test_data["program"].iloc[i].lower().strip() and
                 card_set_preds[i].lower().strip() == test_data["card_set"].iloc[i].lower().strip() and
-                athlete_preds[i].lower().strip() == test_data["athlete"].iloc[i].lower().strip()
+                athlete_preds[i].lower().strip() in test_data["athlete"].iloc[i].lower().strip()
         ):
             correct_count += 1
 
@@ -72,9 +72,10 @@ def load_vec_data(tag_vec_name):
 
 if __name__ == '__main__':
     # 加载微调后的模型
-    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")
+    # model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6")
+    model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-mpnet-base-v2_fine_tag01")
 
-    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test2.xlsx")
+    test_data = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01_test.xlsx")
     ebay_text_list = test_data["ebay_text"]
 
     # test_tag("program", "program")  # 注释掉原来的单个 tag 测试

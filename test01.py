@@ -1,10 +1,25 @@
-from sentence_transformers import SentenceTransformer
-import os
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "mysite.settings")
+import threading
+import time
 
-if __name__ == '__main__':
-    model_path = r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag5"  # 替换为你的模型路径
-    model = SentenceTransformer(model_path)
+data = [i for i in range(10)]
 
-    print(model)
-    print()
+
+def task(data, start, end, name, delay=None):
+    for i in range(start, end):
+        if delay is not None and i > 2:
+            time.sleep(delay)
+        print(f"{name}: {data[i]}")
+
+
+t1 = threading.Thread(target=task, args=(data, 0, 5, 't1', 0.1))
+t2 = threading.Thread(target=task, args=(data, 5, len(data), 't2'))
+
+t_list = [t1, t2]
+
+for t in t_list:
+    t.start()
+
+for t in t_list:
+    t.join()
+
+print('结束')

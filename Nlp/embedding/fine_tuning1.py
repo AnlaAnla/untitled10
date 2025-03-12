@@ -9,7 +9,7 @@ os.environ["WANDB_DISABLED"] = "true"
 
 # 加载模型
 # model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
-model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")
+model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6")
 
 # 定义损失函数
 train_loss = losses.MultipleNegativesRankingLoss(model)
@@ -33,10 +33,10 @@ train_dataloader = DataLoader(train_data, shuffle=True, batch_size=128)
 
 # 训练模型
 model.fit(train_objectives=[(train_dataloader, train_loss)],
-          epochs=20,
+          epochs=12,
           warmup_steps=100,
-          optimizer_params={'lr': 2e-4},
+          optimizer_params={'lr': 1e-4},
           )
 
 # 保存模型
-model.save(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag8")
+model.save(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")

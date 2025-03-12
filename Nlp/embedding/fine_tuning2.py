@@ -1,71 +1,53 @@
 from sentence_transformers import SentenceTransformer, InputExample, losses, evaluation
 from torch.utils.data import DataLoader
-from transformers import get_linear_schedule_with_warmup
-from torch.optim import AdamW
 import pandas as pd
 import os
+from sklearn.model_selection import train_test_split
 
-# 禁用 WandB (如果你不想使用它)
+# 禁用 WandB (保持不变)
 os.environ["WANDB_DISABLED"] = "true"
 
 # 加载模型
-model = SentenceTransformer(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6")
+model = SentenceTransformer('sentence-transformers/all-mpnet-base-v2')
 
 # 定义损失函数
 train_loss = losses.MultipleNegativesRankingLoss(model)
 
 # 加载数据集
 df = pd.read_excel(r"D:\Code\ML\Text\embedding\ebay_2023_data01.xlsx")
-train_df = df.sample(frac=0.9, random_state=42)  # 80% 训练集
-val_df = df.drop(train_df.index)  # 剩余 20% 作为验证集
 
-# 准备训练数据和验证数据
+# 划分训练集和验证集 (80% 训练, 20% 验证)
+train_df, val_df = train_test_split(df, test_size=0.2, random_state=42)
+
+# 准备训练数据
 train_data = [
     InputExample(texts=[row['ebay_text'], row[field]])
     for _, row in train_df.iterrows()
     for field in ['card_set', 'program', 'athlete']
 ]
+
+# 准备验证数据
 val_data = [
-    InputExample(texts=[row['ebay_text'], row[field]], label=1.0)  # 添加 label=1.0
+    InputExample(texts=[row['ebay_text'], row[field]])
     for _, row in val_df.iterrows()
     for field in ['card_set', 'program', 'athlete']
 ]
 
-
-
 # 创建数据加载器
-batch_size = 128  # 根据你的 GPU 内存调整
-accumulation_steps = 2  # 梯度累积
-train_dataloader = DataLoader(train_data, shuffle=True, batch_size=batch_size)
+train_dataloader = DataLoader(train_data, shuffle=True, batch_size=64, num_workers=4)  # 调整 batch_size
+val_dataloader = DataLoader(val_data, shuffle=False, batch_size=64)
 
-# 创建评估器
-evaluator = evaluation.EmbeddingSimilarityEvaluator.from_input_examples(
-    val_data, name='val-set'
-)
+# 定义评估器 (用于验证集评估)
+evaluator = evaluation.EmbeddingSimilarityEvaluator.from_input_examples(val_data, name='val')
 
-# 训练设置
-num_epochs = 30
-num_training_steps = num_epochs * len(train_dataloader) // accumulation_steps  # 考虑梯度累积
-optimizer = AdamW(model.parameters(), lr=3e-4)
-scheduler = get_linear_schedule_with_warmup(
-    optimizer, num_warmup_steps=int(0.1 * num_training_steps), num_training_steps=num_training_steps  # 10% 的预热步数
-)
+# 训练模型
+model.fit(train_objectives=[(train_dataloader, train_loss)],
+          evaluator=evaluator,
+          epochs=20,
+          warmup_steps=100,
+          optimizer_params={'lr': 2e-5},  # 调整学习率
+          early_stopping_patience=3  # 连续3次评估无提升时停止
+          )
 
-# 训练模型 (修改部分)
-model.fit(
-    train_objectives=[(train_dataloader, train_loss)],  # 关键修改：只传入 dataloader 和 loss
-    epochs=num_epochs,
-    evaluator=evaluator,
-    evaluation_steps=500,
-    output_path="path/to/save/best_model",
-    save_best_model=True,
-    optimizer_class=AdamW,  # 添加 optimizer_class
-    optimizer_params={'lr': 2e-4},  # 添加 optimizer_params
-    scheduler='WarmupLinear',  # warmuplinear 变成了 WarmupLinear (首字母大写)
-    warmup_steps=int(0.1 * num_training_steps),  # 10% 的预热步数, 明确指定warmup_steps
-    weight_decay=0.01,  # 添加weight_decay，AdamW的默认值
-    use_amp=True,  # 添加自动混合精度，加快训练速度(如果你的GPU支持)
-)
-
-# 保存最终模型
-model.save(r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag7")
+# 保存模型
+model.save(r"D:\Code\ML\Model\huggingface\all-mpnet-base-v2_fine_tag01")
