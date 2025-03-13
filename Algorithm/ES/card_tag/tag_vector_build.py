@@ -15,7 +15,7 @@ es_config = {
 es = Elasticsearch(**es_config)
 
 # SentenceTransformer 模型 (与之前相同)
-model_path = r"D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_fine_tag6"  # 替换为你的模型路径
+model_path = r'D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_checklist_ebay02'  # 替换为你的模型路径
 model = SentenceTransformer(model_path)
 
 # 根据你的模型和数据确定
@@ -34,7 +34,7 @@ def create_index(es_client, index_name):
                         "index": "true",  # 使用默认的 HNSW 索引
                         "similarity": "dot_product"
                     },
-                    "name": {"type": "keyword"},
+                    "name": {"type": "keyword"} ,
                     "text_id": {"type": "integer"}  # 可选
                 }
             }

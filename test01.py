@@ -14,6 +14,7 @@ def task(data, start, end, name, delay=None):
 t1 = threading.Thread(target=task, args=(data, 0, 5, 't1', 0.1))
 t2 = threading.Thread(target=task, args=(data, 5, len(data), 't2'))
 
+
 t_list = [t1, t2]
 
 for t in t_list:
