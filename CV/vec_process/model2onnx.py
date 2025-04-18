@@ -61,13 +61,11 @@ if __name__ == '__main__':
     # model.fc = torch.nn.Linear(num_features, 175, bias=True)
     # model.load_state_dict(torch.load(r"D:\Code\ML\Model\Card_cls2\resnest50_series01.pth"))
 
-
-
     # 直接加载模型
     torch.hub.list('zhanghang1989/ResNeSt')
-    model = torch.load(r"D:\Code\ML\Model\Card_cls2\resnest50_series05.pt", map_location=device)
+    model = torch.load(r"D:\Code\ML\Model\Card_cls\resnest50_AllCard08.pth", map_location=device)
     features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
     model = torch.nn.Sequential(*features)
 
-    model2onnx(model, r"D:\Code\ML\Model\Card_cls2\resnest50_series05.onnx")
+    model2onnx(model, r"D:\Code\ML\Model\onnx\resnest50_AllCard08.onnx")
     print('end')

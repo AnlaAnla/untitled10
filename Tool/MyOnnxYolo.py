@@ -15,7 +15,7 @@ class MyOnnxYolo:
 
         # 加载yolo model
 
-        self.model = YOLO(model_path, task='segment',verbose=False)
+        self.model = YOLO(model_path, task='segment', verbose=False)
         self.results = None
 
         self.cls = None

@@ -1,20 +1,21 @@
 import os
-from util.MyOnnxModel_Resnet50 import MyOnnxModel
+# from util.MyOnnxModel_Resnet50 import MyOnnxModel
+from util.MyBatchModel_Vit import MyViTFeatureExtractor
 # from MyOnnxModel_MobileNetV3 import MyOnnxModel
 import numpy as np
 
 
-def normalize_numpy(vectors):
-    """
-    使用 NumPy 进行 L2 归一化。
-    """
-    if vectors.ndim == 1:  # 如果是单个向量
-        return vectors / np.linalg.norm(vectors)
-    elif vectors.ndim == 2:  # 如果是多个向量
-        norms = np.linalg.norm(vectors, axis=1, keepdims=True)
-        return vectors / norms
-    else:
-        raise ValueError("输入向量的维度必须是 1 或 2。")
+# def normalize_numpy(vectors):
+#     """
+#     使用 NumPy 进行 L2 归一化。
+#     """
+#     if vectors.ndim == 1:  # 如果是单个向量
+#         return vectors / np.linalg.norm(vectors)
+#     elif vectors.ndim == 2:  # 如果是多个向量
+#         norms = np.linalg.norm(vectors, axis=1, keepdims=True)
+#         return vectors / norms
+#     else:
+#         raise ValueError("输入向量的维度必须是 1 或 2。")
 
 
 # def vec_distance(vec1, vec2):
@@ -30,8 +31,8 @@ def cosine_similarity(vec1, vec2):
 def add_img2vector(img_path, img_name):
     global img_id, vec_data, name_list
 
-    output = onnxModel.run(img_path)
-    output = normalize_numpy(output)  # 归一化
+    output = onnxModel.run([img_path], normalize=True)
+    # output = normalize_numpy(output)  # 归一化
 
     img_id += 1
     name_list.append(img_name)
@@ -39,7 +40,7 @@ def add_img2vector(img_path, img_name):
     print('添加向量: ', img_id, img_name)
 
 
-def search_img2vector(img, top_k:int=None):
+def search_img2vector(img, top_k: int = None):
     '''
 
         :param img:
@@ -48,8 +49,8 @@ def search_img2vector(img, top_k:int=None):
     '''
     global img_id, vec_data, name_list
 
-    output = onnxModel.run(img)
-    output = normalize_numpy(output)  # 归一化
+    output = onnxModel.run([img], normalize=True)
+    # output = normalize_numpy(output)  # 归一化
 
     distances = np.apply_along_axis(cosine_similarity, 1, vec_data, output)
 
@@ -72,16 +73,16 @@ def search_img2vector(img, top_k:int=None):
         return search_names_dis
 
 
-
 if __name__ == '__main__':
-    onnxModel = MyOnnxModel(r"D:\Code\ML\Model\Card_cls2\resnest50_series05.onnx")
-    # vec_data = np.zeros((1, 960))
+    onnxModel = MyViTFeatureExtractor(r"D:\Code\ML\Model\Card_cls\vit-base-patch16-224-AllCard08")
+    # onnxModel = MyOnnxModel(r"D:\Code\ML\Model\onnx\resnest50_AllCard08.onnx")
+    vec_data = np.zeros((1, 768))
 
     # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
-    vec_data = np.zeros((1, 2048))
+    # vec_data = np.zeros((1, 2048))
 
-    data_dir = r'D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224\val'
-    val_dir = r"D:\Code\ML\Image\_CLASSIFY\card_cls2\train_serices_cls_data_yolo224\train"
+    data_dir = r"D:\Code\ML\Image\_TEST_DATA\Card_test\mosic_prizm\prizm_yolo\base19-20 database"
+    val_dir = r"D:\Code\ML\Image\_TEST_DATA\Card_test\mosic_prizm\prizm_yolo\base 19-20 val"
 
     name_list = ['background']
 
@@ -116,3 +117,9 @@ if __name__ == '__main__':
     print('total_num:', total_num)
     print('yes_num:', yes_num)
     print(yes_num / total_num)
+
+'''
+D:\Code\ML\Image\_TEST_DATA\Card_test\mosic_prizm\prizm_yolo\base19-20 database
+
+
+'''

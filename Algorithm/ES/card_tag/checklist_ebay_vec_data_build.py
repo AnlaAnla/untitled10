@@ -14,7 +14,7 @@ es_config = {
 # 创建 Elasticsearch 客户端
 es = Elasticsearch(**es_config)
 
-# SentenceTransformer 模型 (与之前相同)
+# SentenceTransformer 模型 (与之前相同)吗
 
 
 # 根据你的模型和数据确定
@@ -36,6 +36,8 @@ def load_data_from_excel(file_paths):
 
 
 def create_index(es_client, index_name):
+
+
     """创建 Elasticsearch 索引（如果不存在）。"""
     if not es_client.indices.exists(index=index_name):
         index_settings = {
@@ -150,7 +152,6 @@ def batch_vector_search(es_client, index_name, query_texts, top_k=5):
 if __name__ == '__main__':
     model_path = r'D:\Code\ML\Model\huggingface\all-MiniLM-L6-v2_checklist_ebay03'  # 替换为你的模型路径
     model = SentenceTransformer(model_path)
-
 
     # 将数据索引到 Elasticsearch
     file_paths = [r"D:\Code\ML\Text\embedding\checklist_ebay_data_2023\ebay_2023_01.xlsx",
