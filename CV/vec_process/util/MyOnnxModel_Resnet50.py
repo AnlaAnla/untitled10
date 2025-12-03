@@ -1,7 +1,7 @@
 import torch
 import torchvision.models as models
 import torchvision.transforms as transforms
-import onnxruntime as rt
+import onnxruntime as ort
 from PIL import Image
 import numpy as np
 
@@ -14,7 +14,7 @@ class MyOnnxModel:
 
         self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        self.model = rt.InferenceSession(model_path)
+        self.model = ort.InferenceSession(model_path, providers=['AzureExecutionProvider', 'CPUExecutionProvider'])
 
     def inference_transform(self):
         inference_transform = transforms.Compose([

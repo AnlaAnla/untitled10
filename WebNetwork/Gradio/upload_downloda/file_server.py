@@ -6,8 +6,8 @@ gradio_temp_folder = "temp"
 os.makedirs(gradio_temp_folder, exist_ok=True)
 
 # 服务器文件路径（写死）
-# server_file_path = "temp/212.txt"
-server_file_path = "temp/pokemon2.zip"
+server_file_path = "temp/motor_web.zip"
+# server_file_path = "temp/pokemon2.zip"
 # 如果文件不存在，创建一个示例文件
 if not os.path.exists(server_file_path):
     with open(server_file_path, "w") as f:

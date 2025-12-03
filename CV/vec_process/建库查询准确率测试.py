@@ -1,8 +1,11 @@
 import os
-# from util.MyOnnxModel_Resnet50 import MyOnnxModel
-from util.MyBatchModel_Vit import MyViTFeatureExtractor
+from util.MyOnnxModel_Resnet50 import MyOnnxModel
+from util.MyOnnxYolo import MyOnnxYolo
+# from util.MyBatchModel_Vit import MyViTFeatureExtractor
 # from MyOnnxModel_MobileNetV3 import MyOnnxModel
+from PIL import Image
 import numpy as np
+import cv2
 
 
 # def normalize_numpy(vectors):
@@ -73,9 +76,9 @@ def search_img2vector(img, top_k: int = None):
         return search_names_dis
 
 
-if __name__ == '__main__':
-    onnxModel = MyViTFeatureExtractor(r"D:\Code\ML\Model\Card_cls\vit-base-patch16-224-AllCard08")
-    # onnxModel = MyOnnxModel(r"D:\Code\ML\Model\onnx\resnest50_AllCard08.onnx")
+def main():
+    # onnxModel = MyViTFeatureExtractor(r"D:\Code\ML\Model\Card_cls\vit-base-patch16-224-AllCard08")
+    onnxModel = MyOnnxModel(r"D:\Code\ML\Model\onnx\resnest50_AllCard08.onnx")
     vec_data = np.zeros((1, 768))
 
     # onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\onnx\yolo_card03.onnx")
@@ -117,6 +120,55 @@ if __name__ == '__main__':
     print('total_num:', total_num)
     print('yes_num:', yes_num)
     print(yes_num / total_num)
+
+def img_list_test():
+    global onnxModel
+    onnxModel = MyOnnxModel(r"C:\Code\ML\Model\onnx\resent_out17355_AllCard08.onnx")
+    vec_data = np.zeros((1, 2048))
+    name_list = []
+
+    onnxYolo_card = MyOnnxYolo(r"C:\Code\ML\Model\Card_Seg\yolov11n_card_seg01.pt")
+
+    data_dir = r"C:\Code\ML\Image\_TEST_DATA\Card_test02\vec_error\data"
+    test_dit = r"C:\Code\ML\Image\_TEST_DATA\Card_test02\vec_error\test"
+
+    # onnxYolo_card.set_result(r"C:\Code\ML\Image\_TEST_DATA\Card_test02\vec_error2\data\3.jpg")
+    # img_bgr = onnxYolo_card.get_max_img(0)
+    # img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+
+    for img_name in os.listdir(data_dir):
+        img_path = os.path.join(data_dir, img_name)
+
+        onnxYolo_card.set_result(img_path)
+        img_bgr = onnxYolo_card.get_max_img(0)
+        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+        cv2.imwrite(f"temp/data_{img_name}", img_bgr)
+        output = onnxModel.run(img_rgb)
+
+        name_list.append(img_name)
+        vec_data = np.concatenate([vec_data, output], axis=0)
+        print('添加向量: ', img_name)
+
+    for img_name in os.listdir(test_dit):
+        img_path = os.path.join(test_dit, img_name)
+
+        onnxYolo_card.set_result(img_path)
+        img_bgr = onnxYolo_card.get_max_img(0)
+        img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
+
+        cv2.imwrite(f"temp/test_{img_name}", img_bgr)
+        output = onnxModel.run(img_rgb)
+
+        distances = np.apply_along_axis(cosine_similarity, 1, vec_data, output)
+        print(f"{img_name}: {distances}")
+
+
+
+if __name__ == '__main__':
+    # main()
+    img_list_test()
 
 '''
 D:\Code\ML\Image\_TEST_DATA\Card_test\mosic_prizm\prizm_yolo\base19-20 database

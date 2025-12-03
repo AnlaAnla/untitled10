@@ -43,12 +43,12 @@ def onnx_run(onnx_file_path):
 if __name__ == '__main__':
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     # resnet50
-    # model = models.resnet50(pretrained=False)
-    #
-    # num_in_feature = model.fc.in_features
-    # model.fc = torch.nn.Linear(num_in_feature, 17355)
-    # model.load_state_dict(torch.load(r"C:\Code\ML\Model\resent_out17355_AllCard08.pth", map_location=torch.device('cpu')))
-    #
+    model = models.resnet50(pretrained=False)
+
+    num_in_feature = model.fc.in_features
+    model.fc = torch.nn.Linear(num_in_feature, 17355)
+    model.load_state_dict(torch.load(r"C:\Code\ML\Model\Card_cls\resent_out17355_AllCard08.pth", map_location=torch.device('cpu')))
+
     # features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
     # model = torch.nn.Sequential(*features)
     #
@@ -62,10 +62,10 @@ if __name__ == '__main__':
     # model.load_state_dict(torch.load(r"D:\Code\ML\Model\Card_cls2\resnest50_series01.pth"))
 
     # 直接加载模型
-    torch.hub.list('zhanghang1989/ResNeSt')
-    model = torch.load(r"D:\Code\ML\Model\Card_cls\resnest50_AllCard08.pth", map_location=device)
-    features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
-    model = torch.nn.Sequential(*features)
+    # torch.hub.list('zhanghang1989/ResNeSt')
+    # model = torch.load(r"D:\Code\ML\Model\Card_cls\resnest50_AllCard08.pth", map_location=device)
+    # features = list(model.children())[:-1]  # 去掉全连接层和池化层, 池化层操作在numpy处理 [:-1]为去掉全连接,-2为去掉全连接和池化层
+    # model = torch.nn.Sequential(*features)
 
-    model2onnx(model, r"D:\Code\ML\Model\onnx\resnest50_AllCard08.onnx")
+    model2onnx(model, r"temp\resnest50_AllCard08.onnx")
     print('end')
