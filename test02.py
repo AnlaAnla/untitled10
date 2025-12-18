@@ -1,12 +1,31 @@
-import torch
+import json
 
-print(f"PyTorch 版本: {torch.__version__}")
-print(f"CUDA 是否可用: {torch.cuda.is_available()}")
-print(f"可见 GPU 数量: {torch.cuda.device_count()}")
+def format_time(seconds):
+    hours = int(seconds // 3600)
+    minutes = int((seconds % 3600) // 60)
+    secs = seconds % 60
+    return f"{hours:02d}:{minutes:02d}:{secs:02.0f}"
 
-if torch.cuda.is_available():
-    print("-" * 30)
-    for i in range(torch.cuda.device_count()):
-        # 这里的显存总量应该是 16GB (V100)，而不是 3GB (1060)
-        p = torch.cuda.get_device_properties(i)
-        print(f"逻辑设备 cuda:{i} -> {p.name} (显存: {p.total_memory / 1024**3:.1f} GB)")
+# 读取文件
+with open(r"C:\Code\ML\Project\untitled10\Audio\temp\transcripts\backyardhits1.json", 'r', encoding='utf-8') as f:
+    data = json.load(f)
+
+# 转换
+for segment in data['segments']:
+    segment['start'] = format_time(segment['start'])
+    segment['end'] = format_time(segment['end'])
+
+    print(segment)
+
+# 保存到新文件
+with open(r"C:\Code\ML\Project\untitled10\Audio\temp\transcripts\backyardhits1.txt", 'w', encoding='utf-8') as f:
+    for segment in data['segments']:
+        break_text = "\n"
+        text = f"{segment['start']}{break_text}{segment['text']}{break_text}"
+        f.write(text)
+        f.write(break_text)
+
+# with open(r"C:\Code\ML\Project\untitled10\Audio\temp\transcripts\_backyardhits1.json", 'w', encoding='utf-8') as f:
+#     json.dump(data, f, indent=2, ensure_ascii=False)
+#
+# print("转换完成，已保存为 output_formatted.json")

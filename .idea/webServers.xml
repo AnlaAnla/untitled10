@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="d2cb32ac-b84d-4943-9b4d-7d2e79060b32" name="192.168.66.117">
+        <fileTransfer accessType="SFTP" host="192.168.66.117" port="22" sshConfigId="1f4675a1-3969-49dd-bee4-e1b8d197a986" sshConfig="martin@192.168.66.117:22 password">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseSudo="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+      <webServer id="4693debc-9c63-4ad3-bf60-5a1e948cec14" name="拍照的大家伙pi@pi@192.168.66.212">
+        <fileTransfer accessType="SFTP" host="192.168.66.212" port="22" sshConfigId="e4eb8b57-90eb-4d2b-817e-3850ee60ff5b" sshConfig="pi@192.168.66.212:22 password">
+          <advancedOptions>
+            <advancedOptions controlEncoding="UTF-8" dataProtectionLevel="Private" keepAliveTimeout="0" passiveMode="true" shareSSLContext="true" isUseSudo="true" />
+          </advancedOptions>
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>

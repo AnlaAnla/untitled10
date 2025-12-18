@@ -24,10 +24,9 @@ class MyViTFeatureExtractor:
             logging.error(f"指定的本地模型路径不是一个有效目录: {local_model_path}")
             raise NotADirectoryError(f"指定的本地模型路径不是一个有效目录: {local_model_path}")
         config_path = os.path.join(local_model_path, 'config.json')
-        # 检查 safetensors 或 bin 文件是否存在
+
         weights_path_st = os.path.join(local_model_path, 'model.safetensors')
-        weights_path_bin = os.path.join(local_model_path, 'pytorch_model.bin')
-        if not os.path.exists(config_path) or not (os.path.exists(weights_path_st) or os.path.exists(weights_path_bin)):
+        if not os.path.exists(config_path) or not (os.path.exists(weights_path_st)):
             logging.error(
                 f"本地模型目录 {local_model_path} 缺少 config.json 或模型权重文件 (model.safetensors / pytorch_model.bin)。")
             raise FileNotFoundError(f"本地模型目录 {local_model_path} 缺少 config.json 或模型权重文件。")
@@ -40,7 +39,6 @@ class MyViTFeatureExtractor:
 
         # 2. 从本地目录加载模型配置和权重
         try:
-            # 使用 local_files_only=True 强制只使用本地文件，不进行网络检查
             self.config = ViTConfig.from_pretrained(local_model_path, local_files_only=True)
             self.model = ViTModel.from_pretrained(local_model_path, config=self.config, local_files_only=True)
         except Exception as e:
@@ -59,7 +57,6 @@ class MyViTFeatureExtractor:
         self.feature_dim = self.model.config.hidden_size
         logging.info(f"模型特征维度: {self.feature_dim}")
 
-    # --- _create_inference_transform 和 run 方法保持不变 ---
     def _create_inference_transform(self):
         """创建图像预处理的流水线。"""
         image_size = self.config.image_size
@@ -71,7 +68,7 @@ class MyViTFeatureExtractor:
             transforms.Normalize(norm_mean, norm_std),
         ])
 
-    def run(self, imgs: List[Union[str, np.ndarray, Image.Image]], normalize: bool = False) -> np.ndarray:
+    def run(self, imgs: List[Union[str, np.ndarray, Image.Image]], normalize: bool = True) -> np.ndarray:
         """
         处理一批图像并返回它们的特征向量 (CLS token 的最后一个隐藏层状态)。
         """
@@ -141,7 +138,7 @@ class MyViTFeatureExtractor:
             epsilon = 1e-12
             output_features_np = output_features_np / (norms + epsilon)
 
-        # 5. 处理部分失败的情况并返回结果 (与之前版本相同)
+        # 5. 处理部分失败的情况并返回结果
         if len(output_features_np) != len(imgs):
             final_output = np.full((len(imgs), self.feature_dim), np.nan, dtype=np.float32)
             for i, feature_vec in zip(valid_indices, output_features_np):
