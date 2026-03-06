@@ -1,99 +1,75 @@
-import whisper
-import json
 import os
-import time
-import torch
+from faster_whisper import WhisperModel
 
-os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
-# ================= 配置区域 =================
-# 输入 MP3 目录
-input_dir = "./temp/audio"
-# 输出 JSON 目录
-output_dir = "./temp/transcripts"
+def format_timestamp(seconds: float):
+    """
+    将秒数转换为 SRT 时间戳格式 (HH:MM:SS,mmm)
+    """
+    whole_seconds = int(seconds)
+    # milliseconds = int((seconds - whole_seconds) * 1000)
 
-# 模型大小: "large-v3", "medium", "small", "base"
-# 注意: 官方 large-v3 需要约 10GB 显存。如果显存报错，请改用 "medium"
-model_size = "large-v3"
-# ===========================================
+    hours = whole_seconds // 3600
+    minutes = (whole_seconds % 3600) // 60
+    secs = whole_seconds % 60
 
-# 1. 检查并创建输出目录
-if not os.path.exists(output_dir):
-    os.makedirs(output_dir)
-    print(f"已创建输出目录: {output_dir}")
+    return f"{hours:02d}:{minutes:02d}:{secs:02d}"
 
-# 2. 获取目录下所有 mp3 文件
-mp3_files = [f for f in os.listdir(input_dir) if f.lower().endswith('.mp3')]
 
-if not mp3_files:
-    print(f"警告: 在 {input_dir} 中没有找到 .mp3 文件。")
-    exit()
+def transcribe_mp3_to_srt(mp3_path, model_size="large-v3", device="cuda", compute_type="int8_float16",
+                          language=None):
+    print(f"正在加载模型: {model_size} ({compute_type})...")
 
-# 3. 加载模型
-print(f"正在加载 OpenAI-Whisper 模型: {model_size}...")
-device = "cuda" if torch.cuda.is_available() else "cpu"
-print(f"运行设备: {device}")
+    # 1. 初始化模型
+    # 这里是核心：使用 cuda 和 int8_float16 达到速度与精度的平衡
+    model = WhisperModel(model_size, device=device, compute_type=compute_type)
 
-try:
-    # 官方库会自动下载模型到 ~/.cache/whisper
-    model = whisper.load_model(model_size, device=device)
-except Exception as e:
-    print(f"加载模型出错: {e}")
-    print("建议检查显存或尝试更小的模型 (如 'medium')")
-    exit()
+    print(f"正在转录音频: {mp3_path} ...")
 
-print(f"准备开始，共发现 {len(mp3_files)} 个音频文件。")
+    # 2. 开始转录
+    # beam_size=5 是官方推荐的精度设置
+    # vad_filter=True 会自动过滤静音片段，极大提升长音频的处理速度
+    segments, info = model.transcribe(
+        mp3_path,
+        beam_size=5,
+        vad_filter=True,
+        language=language
+    )
 
-# 4. 批量循环处理
-for index, filename in enumerate(mp3_files):
-    file_path = os.path.join(input_dir, filename)
-    file_name_without_ext = os.path.splitext(filename)[0]
-    output_filename = os.path.join(output_dir, f"{file_name_without_ext}.json")
+    print(f"检测到语言: {info.language}, 置信度: {info.language_probability:.2f}")
 
-    start_time = time.time()
-    print(f"[{index + 1}/{len(mp3_files)}] 正在识别: {filename} ...")
+    # 3. 输出文件名
+    srt_filename = os.path.splitext(mp3_path)[0] + ".txt"
 
-    # 5. 执行识别
-    # language=None 表示自动检测。
-    # 如果你是纯中文，建议改为 language="zh"；纯英文改为 language="en"
-    try:
-        result = model.transcribe(
-            file_path,
-            beam_size=5,
-            language=None, # None = 自动检测
-            fp16=True if device == "cuda" else False, # 显卡加速时开启半精度
-            verbose=False # 设为 True 可以在控制台实时看到吐字
-        )
-    except Exception as e:
-        print(f"   -> 识别文件出错: {e}")
-        continue
+    # 4. 写入 SRT 文件
+    # 注意：segments 是一个生成器，只有在遍历时才会真正开始计算（流式处理）
+    with open(srt_filename, "w", encoding="utf-8") as f:
+        for i, segment in enumerate(segments, start=1):
+            start_time = format_timestamp(segment.start)
+            end_time = format_timestamp(segment.end)
+            text = segment.text.strip()
 
-    # 获取检测到的语言 (官方库结果字典里包含了 language 字段)
-    detected_lang = result.get('language', 'unknown')
-    print(f"   -> 检测到语言: {detected_lang}")
+            # 写入 SRT 格式
+            # f.write(f"{i}\n")
+            # f.write(f"{start_time} --> {end_time}\n")
+            # f.write(f"{text}\n\n")
 
-    # 6. 提取结果
-    # 官方库的 segments 结构和 faster-whisper 略有不同，是一个字典列表
-    formatted_segments = []
-    for segment in result['segments']:
-        formatted_segments.append({
-            "start": round(segment['start'], 2),
-            "end": round(segment['end'], 2),
-            "text": segment['text'].strip()
-        })
+            # txt 格式
+            f.write(f"{start_time}\n")
+            f.write(f"{text}\n\n")
 
-    # 7. 保存结果
-    with open(output_filename, "w", encoding="utf-8") as f:
-        data = {
-            "filename": filename,
-            "language": detected_lang,
-            "segments": formatted_segments,
-            # "full_text": result['text'].strip()
-        }
-        json.dump(data, f, ensure_ascii=False, indent=2)
+            # 可选：实时打印进度
+            print(f"[{start_time} -> {end_time}] {text}")
 
-    elapsed = time.time() - start_time
-    print(f"   -> 完成！耗时: {elapsed:.2f}秒. 保存至: {output_filename}")
+    print(f"\n✅ 提取完成！字幕已保存为: {srt_filename}")
 
-print("-" * 30)
-print(f"所有任务处理完毕。输出目录: {output_dir}")
+
+if __name__ == "__main__":
+    # 替换为你的 mp3 文件路径
+    audio_file = "/home/martin/ML/RemoteProject/untitled10/Audio/temp/audio/2026_02_25 16_47_46.mp3"
+
+    if os.path.exists(audio_file):
+        transcribe_mp3_to_srt(audio_file, compute_type="default")
+    else:
+        print(f"找不到文件: {audio_file}")
+        print('==')
