@@ -47,7 +47,10 @@ class MetricViT(nn.Module):
         cls_token = outputs.last_hidden_state[:, 0]
         # L2 归一化，这对 Metric Learning 至关重要
         features = F.normalize(cls_token, p=2, dim=1)
-        logits = self.classifier(features) * 30.0
+
+        weight = F.normalize(self.classifier.weight, p=2, dim=1)
+        logits = F.linear(features, weight) * 30.0
+
         return logits, features
 
 
@@ -55,11 +58,10 @@ class MetricViT(nn.Module):
 data_transforms = {
     'train': transforms.Compose([
         transforms.Resize((240, 240)),
-        transforms.RandomResizedCrop(IMAGE_SIZE, scale=(0.6, 1.0)),
-        transforms.RandomPerspective(distortion_scale=0.5, p=0.5),
-        transforms.RandomRotation(degrees=20),
-        transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.05),
-        transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
+        transforms.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0)),
+        transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
+        transforms.RandomRotation(degrees=15),
+        transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.05, hue=0),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
@@ -174,7 +176,7 @@ def main():
     ], weight_decay=WEIGHT_DECAY)
 
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
-    criterion = nn.CrossEntropyLoss(label_smoothing=0.1)
+    criterion = nn.CrossEntropyLoss()
 
     # 混合精度
     scaler = torch.amp.GradScaler('cuda')
@@ -182,7 +184,7 @@ def main():
     print("开始训练循环...")
 
     # 初始化最佳准确率
-    best_acc = 0.85
+    best_acc = 0.0
 
     for epoch in range(EPOCHS):
         model.train()
@@ -191,22 +193,21 @@ def main():
         all_labels = []
 
         with tqdm(train_loader, desc=f"Epoch {epoch + 1}/{EPOCHS}") as t:
+            optimizer.zero_grad(set_to_none=True)
+
             for i, (inputs, labels) in enumerate(t):
                 inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
-                optimizer.zero_grad()
-
                 with torch.amp.autocast('cuda'):
-                    logits, _ = model(inputs)
-                    loss = criterion(logits, labels)
+                    logits, feats = model(inputs)
+                    loss = criterion(logits, labels) / GRAD_ACCUMULATION_STEPS
 
-                # 缩放损失
-                scaler.scale(loss / GRAD_ACCUMULATION_STEPS).backward()
+                scaler.scale(loss).backward()
 
-                if (i + 1) % GRAD_ACCUMULATION_STEPS == 0:
+                if (i + 1) % GRAD_ACCUMULATION_STEPS == 0 or (i + 1) == len(train_loader):
                     scaler.step(optimizer)
                     scaler.update()
-                    optimizer.zero_grad()
+                    optimizer.zero_grad(set_to_none=True)
 
                 running_loss += loss.item() * inputs.size(0)
                 preds = torch.argmax(logits, dim=1)

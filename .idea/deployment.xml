@@ -2,7 +2,7 @@
 <project version="4">
   <component name="PublishConfigData" autoUpload="Always" serverName="显卡服务器@192.168.77.249" remoteFilesAllowedToDisappearOnAutoupload="false">
     <serverData>
-      <paths name="192.168.31.243">
+      <paths name="192.168.31.114">
         <serverdata>
           <mappings>
             <mapping local="$PROJECT_DIR$" web="/" />

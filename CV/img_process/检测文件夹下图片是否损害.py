@@ -48,7 +48,7 @@ def process_images(img_paths, num_processes):
 
 if __name__ == "__main__":
     img_dir = Path(
-        r"D:\Code\ML\Image\_TEST_DATA\Card_series_cls\2023-24"
+        r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_cn"
     )
     img_paths = list(img_dir.glob("*/*"))  # 使用 pathlib 简化路径操作
 

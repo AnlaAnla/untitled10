@@ -72,4 +72,4 @@ with gr.Blocks(title="File Downloader & Uploader", theme=gr.themes.Soft()) as de
     download_button.click(download_file, outputs=gr.File(label="下载文件"))
     upload_button.click(upload_file, inputs=upload_file_input, outputs=upload_status_label)
 
-demo.launch(server_name='0.0.0.0', server_port=2345)
+demo.launch(server_name='0.0.0.0', server_port=2345, share=True)

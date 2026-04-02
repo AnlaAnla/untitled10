@@ -1,13 +1,12 @@
 from ultralytics import YOLO
 
-# Initialize model
-model = YOLO(r"C:\Code\ML\Model\Card_Seg\yoloe-26l-seg.pt")  # or select yoloe-26s/m-seg.pt for different sizes
+# 初始化模型
+model = YOLO(r"C:\Code\ML\Model\Card_Seg\card_hand_yoloe26s_seg01.pt")
 
-# Set text prompt to detect person and bus. You only need to do this once after you load the model.
-model.set_classes(["text", "ball"])
+# 预测
+results = model.predict(
+    r"C:\Users\wow38\Pictures\videoframe_6871967 - 副本.png"
+)
 
-# Run detection on the given image
-results = model.predict(r"C:\Users\wow38\Pictures\36c2ddcc-a8bb-46b4-9aff-3a5e1ea50e25.jpg")
-
-# Show results
+# 显示结果
 results[0].show()

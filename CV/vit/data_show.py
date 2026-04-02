@@ -5,27 +5,27 @@ from torchvision import transforms
 
 # ================= 配置区域 =================
 # 替换为你想要测试的图片路径
-IMG_PATH = r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon\伊布_us\1ce1a638-5754-45c2-81d0-b46fb2ba7671.png"
+IMG_PATH = r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_tc\('1502952', {'tc'}, '臭臭花'), 002\632af6cd-9482-4bc3-8c07-a2a59b4bd74b.png"
 
 # ================= 定义增强 (去掉了缩放和归一化) =================
 # 注意：RandomPerspective 和 GaussianBlur 现在的 torchvision 版本支持直接对 PIL 图像操作
 view_transforms = transforms.Compose([
     # ---------------- 被移除的缩放层 ----------------
-    # transforms.Resize((240, 240)),
-    # transforms.RandomResizedCrop(224, scale=(0.6, 1.0)),
+    transforms.Resize((240, 240)),
+    transforms.RandomResizedCrop(224, scale=(0.85, 1.0)),
 
     # ---------------- 保留的增强层 ----------------
     # 透视变换 (模拟拍摄角度倾斜)
-    transforms.RandomPerspective(distortion_scale=0.5, p=0.5),
+    transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
 
     # 随机旋转 (模拟卡片没摆正)
-    transforms.RandomRotation(degrees=20),
+    transforms.RandomRotation(degrees=15),
 
     # 颜色抖动 (模拟光照、色差)
-    transforms.ColorJitter(brightness=0.3, contrast=0.3, saturation=0.3, hue=0.05),
+    transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.05, hue=0),
 
     # 高斯模糊 (模拟对焦不准)
-    transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 2.0)),
+    # transforms.GaussianBlur(kernel_size=3, sigma=0.01),
 
     # ---------------- 被移除的张量化和归一化 ----------------
     # transforms.ToTensor(),

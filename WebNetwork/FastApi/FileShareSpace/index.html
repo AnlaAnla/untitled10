@@ -1,0 +1,699 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>局域网文件中转站</title>
+    <style>
+        :root {
+            --bg: #f4efe8;
+            --bg-deep: #dfe7df;
+            --panel: rgba(255, 252, 248, 0.78);
+            --panel-strong: rgba(255, 252, 248, 0.94);
+            --line: rgba(31, 41, 55, 0.08);
+            --ink: #17212b;
+            --subtle: #5d6a75;
+            --accent: #0f766e;
+            --accent-2: #c2410c;
+            --danger: #b91c1c;
+            --shadow: 0 18px 45px rgba(22, 33, 43, 0.10);
+            --radius: 24px;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            min-height: 100vh;
+            color: var(--ink);
+            font-family: "Segoe UI Variable", "PingFang SC", "Microsoft YaHei UI", sans-serif;
+            background:
+                radial-gradient(circle at top left, rgba(15, 118, 110, 0.18), transparent 30%),
+                radial-gradient(circle at right 20%, rgba(194, 65, 12, 0.16), transparent 24%),
+                linear-gradient(135deg, var(--bg) 0%, var(--bg-deep) 100%);
+        }
+
+        .page {
+            width: min(1180px, calc(100vw - 32px));
+            margin: 0 auto;
+            padding: 36px 0 48px;
+        }
+
+        .hero {
+            padding: 28px;
+            border: 1px solid var(--line);
+            border-radius: calc(var(--radius) + 4px);
+            background: linear-gradient(135deg, rgba(255, 252, 248, 0.95), rgba(255, 247, 237, 0.82));
+            box-shadow: var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .hero::after {
+            content: "";
+            position: absolute;
+            inset: auto -60px -60px auto;
+            width: 220px;
+            height: 220px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(15, 118, 110, 0.15), transparent 70%);
+        }
+
+        .eyebrow {
+            display: inline-flex;
+            padding: 8px 12px;
+            border-radius: 999px;
+            background: rgba(15, 118, 110, 0.10);
+            color: var(--accent);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        h1 {
+            margin: 16px 0 10px;
+            font-size: clamp(34px, 4vw, 54px);
+            line-height: 1.02;
+            letter-spacing: -0.03em;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 760px;
+            color: var(--subtle);
+            font-size: 16px;
+            line-height: 1.7;
+        }
+
+        .strip {
+            margin: 18px 0 24px;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+        }
+
+        .status-card,
+        .panel {
+            border: 1px solid var(--line);
+            border-radius: var(--radius);
+            background: var(--panel);
+            backdrop-filter: blur(14px);
+            box-shadow: var(--shadow);
+        }
+
+        .status-card {
+            flex: 1 1 420px;
+            padding: 16px 18px;
+        }
+
+        .status-label {
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            color: var(--subtle);
+        }
+
+        .status-text {
+            margin-top: 8px;
+            font-size: 15px;
+            line-height: 1.6;
+        }
+
+        .status-text.success { color: var(--accent); }
+        .status-text.error { color: var(--danger); }
+
+        .row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .panel {
+            padding: 22px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 18px;
+        }
+
+        .panel-head {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 16px;
+            margin-bottom: 18px;
+        }
+
+        h2 {
+            margin: 0;
+            font-size: 24px;
+            letter-spacing: -0.02em;
+        }
+
+        .meta {
+            color: var(--subtle);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .upload-box {
+            display: grid;
+            gap: 12px;
+            padding: 16px;
+            border-radius: 20px;
+            border: 1px dashed rgba(15, 118, 110, 0.28);
+            background: rgba(255, 255, 255, 0.52);
+            margin-bottom: 14px;
+        }
+
+        .upload-box.locked {
+            border-style: solid;
+            border-color: rgba(194, 65, 12, 0.24);
+            background: rgba(255, 247, 237, 0.74);
+        }
+
+        label {
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--subtle);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        input[type="file"],
+        input[type="password"] {
+            width: 100%;
+            border: 1px solid rgba(31, 41, 55, 0.12);
+            border-radius: 14px;
+            background: rgba(255, 255, 255, 0.95);
+            color: var(--ink);
+            padding: 12px 14px;
+            font: inherit;
+        }
+
+        button {
+            border: 0;
+            border-radius: 999px;
+            padding: 12px 18px;
+            font: inherit;
+            font-weight: 700;
+            cursor: pointer;
+            transition: transform 0.16s ease, opacity 0.16s ease, box-shadow 0.16s ease;
+        }
+
+        button:hover {
+            transform: translateY(-1px);
+        }
+
+        button:disabled {
+            cursor: wait;
+            opacity: 0.68;
+            transform: none;
+        }
+
+        .primary {
+            color: white;
+            background: linear-gradient(135deg, #0f766e, #115e59);
+            box-shadow: 0 10px 24px rgba(15, 118, 110, 0.22);
+        }
+
+        .secondary {
+            color: white;
+            background: linear-gradient(135deg, #c2410c, #9a3412);
+            box-shadow: 0 10px 24px rgba(194, 65, 12, 0.20);
+        }
+
+        .ghost {
+            background: rgba(255, 255, 255, 0.9);
+            color: var(--ink);
+            border: 1px solid rgba(31, 41, 55, 0.10);
+        }
+
+        .danger {
+            background: rgba(185, 28, 28, 0.08);
+            color: var(--danger);
+        }
+
+        .file-list {
+            display: grid;
+            gap: 12px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 16px;
+            padding: 14px 16px;
+            border-radius: 18px;
+            background: var(--panel-strong);
+            border: 1px solid rgba(31, 41, 55, 0.06);
+        }
+
+        .file-title {
+            font-size: 15px;
+            font-weight: 700;
+            word-break: break-all;
+        }
+
+        .file-subtitle {
+            margin-top: 6px;
+            color: var(--subtle);
+            font-size: 13px;
+        }
+
+        .actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .empty {
+            padding: 18px;
+            border-radius: 18px;
+            background: rgba(255, 255, 255, 0.55);
+            color: var(--subtle);
+            text-align: center;
+        }
+
+        .hint {
+            color: var(--subtle);
+            font-size: 13px;
+            line-height: 1.7;
+        }
+
+        .footer {
+            margin-top: 18px;
+            color: var(--subtle);
+            font-size: 13px;
+            text-align: center;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        @media (max-width: 920px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 640px) {
+            .page {
+                width: min(100vw - 20px, 100%);
+                padding-top: 20px;
+            }
+
+            .hero,
+            .panel,
+            .status-card {
+                border-radius: 20px;
+            }
+
+            .file-item {
+                align-items: flex-start;
+                flex-direction: column;
+            }
+
+            .actions {
+                width: 100%;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="page">
+        <section class="hero">
+            <span class="eyebrow">FastAPI LAN Share</span>
+            <h1>局域网文件中转站</h1>
+            <p>
+                共享区用于你上传文件给局域网客户端下载，收件区用于客户端把文件上传给你。
+                页面打开即可用，不依赖数据库，文件直接落盘，适合家庭网络或办公室内网临时共享。
+            </p>
+        </section>
+
+        <div class="strip">
+            <div class="status-card">
+                <div class="status-label">运行状态</div>
+                <div id="statusText" class="status-text">正在连接服务...</div>
+            </div>
+            <div class="row">
+                <button id="refreshBtn" class="ghost">刷新列表</button>
+            </div>
+        </div>
+
+        <section id="adminPanel" class="panel">
+            <div class="panel-head">
+                <div>
+                    <h2>管理权限</h2>
+                    <div class="meta">管理端可上传共享区文件、查看和清理收件区。</div>
+                </div>
+                <div id="adminState" class="meta"></div>
+            </div>
+            <div class="row" id="adminControls">
+                <input id="adminKey" type="password" placeholder="输入 FILESHARE_ADMIN_KEY" autocomplete="current-password">
+                <button id="loginBtn" class="secondary">解锁管理</button>
+                <button id="logoutBtn" class="ghost">退出管理</button>
+            </div>
+            <div id="adminHint" class="hint" style="margin-top: 12px;"></div>
+        </section>
+
+        <section class="grid" style="margin-top: 18px;">
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>共享区</h2>
+                        <div class="meta">客户端可直接下载这里的文件。</div>
+                    </div>
+                    <div id="sharedCount" class="meta">0 个文件</div>
+                </div>
+
+                <form id="sharedUploadForm" class="upload-box">
+                    <label for="sharedFiles">上传到共享区</label>
+                    <input id="sharedFiles" type="file" multiple>
+                    <div class="row">
+                        <button id="sharedUploadBtn" type="submit" class="primary">上传共享文件</button>
+                    </div>
+                    <div id="sharedUploadHint" class="hint">只有管理端可上传到共享区。</div>
+                </form>
+
+                <div id="sharedList" class="file-list"></div>
+            </section>
+
+            <section class="panel">
+                <div class="panel-head">
+                    <div>
+                        <h2>收件区</h2>
+                        <div class="meta">客户端上传给服务器的文件会存放在这里。</div>
+                    </div>
+                    <div id="inboxCount" class="meta">0 个文件</div>
+                </div>
+
+                <form id="inboxUploadForm" class="upload-box">
+                    <label for="inboxFiles">上传给服务器</label>
+                    <input id="inboxFiles" type="file" multiple>
+                    <div class="row">
+                        <button id="inboxUploadBtn" type="submit" class="secondary">发送到收件区</button>
+                    </div>
+                    <div class="hint">任何能访问本页面的局域网客户端都可以上传到收件区。</div>
+                </form>
+
+                <div id="inboxList" class="file-list"></div>
+            </section>
+        </section>
+    </main>
+
+    <script>
+        const adminRequired = false;
+        const els = {
+            statusText: document.getElementById("statusText"),
+            refreshBtn: document.getElementById("refreshBtn"),
+            adminPanel: document.getElementById("adminPanel"),
+            adminControls: document.getElementById("adminControls"),
+            adminState: document.getElementById("adminState"),
+            adminHint: document.getElementById("adminHint"),
+            adminKey: document.getElementById("adminKey"),
+            loginBtn: document.getElementById("loginBtn"),
+            logoutBtn: document.getElementById("logoutBtn"),
+            sharedCount: document.getElementById("sharedCount"),
+            inboxCount: document.getElementById("inboxCount"),
+            sharedUploadForm: document.getElementById("sharedUploadForm"),
+            inboxUploadForm: document.getElementById("inboxUploadForm"),
+            sharedFiles: document.getElementById("sharedFiles"),
+            inboxFiles: document.getElementById("inboxFiles"),
+            sharedUploadBtn: document.getElementById("sharedUploadBtn"),
+            inboxUploadBtn: document.getElementById("inboxUploadBtn"),
+            sharedUploadHint: document.getElementById("sharedUploadHint"),
+            sharedList: document.getElementById("sharedList"),
+            inboxList: document.getElementById("inboxList"),
+        };
+
+        let state = {
+            isAdmin: !adminRequired,
+        };
+
+        function setStatus(message, kind = "") {
+            els.statusText.textContent = message;
+            els.statusText.className = `status-text ${kind}`.trim();
+        }
+
+        function formatBytes(bytes) {
+            if (!Number.isFinite(bytes) || bytes < 0) {
+                return "-";
+            }
+            const units = ["B", "KB", "MB", "GB", "TB"];
+            let value = bytes;
+            let unit = units[0];
+            for (let index = 0; index < units.length; index += 1) {
+                unit = units[index];
+                if (value < 1024 || index === units.length - 1) {
+                    break;
+                }
+                value /= 1024;
+            }
+            return `${value >= 100 || unit === "B" ? value.toFixed(0) : value.toFixed(1)} ${unit}`;
+        }
+
+        function createEmpty(message) {
+            const empty = document.createElement("div");
+            empty.className = "empty";
+            empty.textContent = message;
+            return empty;
+        }
+
+        function downloadFile(area, name) {
+            window.location.href = `/download/${area}/${encodeURIComponent(name)}`;
+        }
+
+        async function deleteFile(area, name) {
+            if (!confirm(`确认删除 ${name} ?`)) {
+                return;
+            }
+            const response = await fetch(`/api/files/${area}/${encodeURIComponent(name)}`, {
+                method: "DELETE",
+            });
+            const payload = await response.json().catch(() => ({ detail: "删除失败" }));
+            if (!response.ok) {
+                throw new Error(payload.detail || "删除失败");
+            }
+            setStatus(`已删除 ${name}`, "success");
+            await refreshData(true);
+        }
+
+        function renderList(container, files, area, showDelete, emptyMessage) {
+            container.innerHTML = "";
+            if (!files.length) {
+                container.appendChild(createEmpty(emptyMessage));
+                return;
+            }
+
+            const fragment = document.createDocumentFragment();
+            for (const file of files) {
+                const item = document.createElement("article");
+                item.className = "file-item";
+
+                const info = document.createElement("div");
+                info.innerHTML = `
+                    <div class="file-title">${file.name}</div>
+                    <div class="file-subtitle">${formatBytes(file.size)} · ${file.updated_at}</div>
+                `;
+
+                const actions = document.createElement("div");
+                actions.className = "actions";
+
+                const downloadBtn = document.createElement("button");
+                downloadBtn.className = "ghost";
+                downloadBtn.textContent = "下载";
+                downloadBtn.addEventListener("click", () => downloadFile(area, file.name));
+                actions.appendChild(downloadBtn);
+
+                if (showDelete) {
+                    const deleteBtn = document.createElement("button");
+                    deleteBtn.className = "danger";
+                    deleteBtn.textContent = "删除";
+                    deleteBtn.addEventListener("click", async () => {
+                        try {
+                            await deleteFile(area, file.name);
+                        } catch (error) {
+                            setStatus(error.message || "删除失败", "error");
+                        }
+                    });
+                    actions.appendChild(deleteBtn);
+                }
+
+                item.appendChild(info);
+                item.appendChild(actions);
+                fragment.appendChild(item);
+            }
+            container.appendChild(fragment);
+        }
+
+        async function refreshData(keepMessage = false) {
+            const response = await fetch("/api/files", {
+                headers: { "Cache-Control": "no-cache" },
+            });
+            if (!response.ok) {
+                throw new Error("文件列表获取失败");
+            }
+            const payload = await response.json();
+            state.isAdmin = payload.is_admin;
+
+            els.sharedCount.textContent = `${payload.shared.length} 个文件`;
+            els.inboxCount.textContent = state.isAdmin ? `${payload.inbox.length} 个文件` : "仅管理端可见";
+
+            renderList(
+                els.sharedList,
+                payload.shared,
+                "shared",
+                state.isAdmin,
+                "共享区暂时还没有文件。",
+            );
+
+            if (state.isAdmin) {
+                renderList(
+                    els.inboxList,
+                    payload.inbox,
+                    "inbox",
+                    true,
+                    "收件区暂时还没有收到文件。",
+                );
+            } else {
+                els.inboxList.innerHTML = "";
+                els.inboxList.appendChild(createEmpty("仅管理端可查看收件区文件列表。"));
+            }
+
+            els.sharedUploadForm.classList.toggle("locked", !state.isAdmin);
+            els.sharedUploadBtn.disabled = !state.isAdmin;
+            els.sharedFiles.disabled = !state.isAdmin;
+            els.sharedUploadHint.textContent = state.isAdmin
+                ? "你当前拥有管理权限，可以把文件放入共享区。"
+                : "共享区上传已锁定。输入管理密钥后可解锁。";
+
+            els.adminState.textContent = state.isAdmin ? "当前: 管理模式" : "当前: 访客模式";
+
+            if (!adminRequired) {
+                els.adminHint.textContent = "当前没有配置 FILESHARE_ADMIN_KEY，任何访问者都拥有管理权限。";
+                els.adminControls.classList.add("hidden");
+            } else {
+                els.adminControls.classList.remove("hidden");
+                els.adminHint.textContent = state.isAdmin
+                    ? "管理模式已启用，本浏览器会话可上传共享文件并查看收件区。"
+                    : "未输入管理密钥时，客户端只能下载共享区并上传到收件区。";
+            }
+
+            if (!keepMessage) {
+                setStatus(
+                    state.isAdmin
+                        ? `服务在线。共享区 ${payload.shared.length} 个文件，收件区 ${payload.inbox.length} 个文件。`
+                        : `服务在线。共享区 ${payload.shared.length} 个文件，当前为访客模式。`,
+                    "success",
+                );
+            }
+        }
+
+        async function uploadFiles(area, input, button, label) {
+            if (!input.files || input.files.length === 0) {
+                setStatus(`请先选择要${label}的文件。`, "error");
+                return;
+            }
+
+            const formData = new FormData();
+            for (const file of input.files) {
+                formData.append("files", file);
+            }
+
+            const original = button.textContent;
+            button.disabled = true;
+            button.textContent = "上传中...";
+            try {
+                const response = await fetch(`/api/upload/${area}`, {
+                    method: "POST",
+                    body: formData,
+                });
+                const payload = await response.json().catch(() => ({ detail: "上传失败" }));
+                if (!response.ok) {
+                    throw new Error(payload.detail || "上传失败");
+                }
+                input.value = "";
+                setStatus(`${label}完成，共保存 ${payload.saved.length} 个文件。`, "success");
+                await refreshData(true);
+            } finally {
+                button.disabled = area === "shared" ? !state.isAdmin : false;
+                button.textContent = original;
+            }
+        }
+
+        async function loginAdmin() {
+            const key = els.adminKey.value.trim();
+            if (!key) {
+                setStatus("请输入管理密钥。", "error");
+                return;
+            }
+            const response = await fetch("/api/admin/login", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ key }),
+            });
+            const payload = await response.json().catch(() => ({ detail: "登录失败" }));
+            if (!response.ok) {
+                setStatus(payload.detail || "管理密钥错误。", "error");
+                return;
+            }
+            els.adminKey.value = "";
+            setStatus("管理权限已解锁。", "success");
+            await refreshData(true);
+        }
+
+        async function logoutAdmin() {
+            await fetch("/api/admin/logout", { method: "POST" });
+            setStatus("已退出管理模式。", "success");
+            await refreshData(true);
+        }
+
+        els.refreshBtn.addEventListener("click", async () => {
+            try {
+                await refreshData();
+            } catch (error) {
+                setStatus(error.message || "刷新失败", "error");
+            }
+        });
+
+        els.loginBtn.addEventListener("click", loginAdmin);
+        els.logoutBtn.addEventListener("click", logoutAdmin);
+
+        els.sharedUploadForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            try {
+                await uploadFiles("shared", els.sharedFiles, els.sharedUploadBtn, "共享区上传");
+            } catch (error) {
+                setStatus(error.message || "共享区上传失败", "error");
+            }
+        });
+
+        els.inboxUploadForm.addEventListener("submit", async (event) => {
+            event.preventDefault();
+            try {
+                await uploadFiles("inbox", els.inboxFiles, els.inboxUploadBtn, "收件区上传");
+            } catch (error) {
+                setStatus(error.message || "收件区上传失败", "error");
+            }
+        });
+
+        refreshData().catch((error) => {
+            setStatus(error.message || "服务连接失败", "error");
+        });
+    </script>
+</body>
+</html>
