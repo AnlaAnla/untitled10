@@ -115,8 +115,8 @@ def letterbox_resize_and_save(args):
 # ==========================================
 def main():
     # --- 配置区域 ---
-    SRC_ROOT = Path("/home/martin/ML/Image/CardCls/panini_archive")
-    DST_ROOT = Path("/home/martin/ML/Image/CardCls/panini_archive_resize392_dinov2/train")
+    SRC_ROOT = Path("/home/martin/ML/Image/CardCls/pokemon_cn")
+    DST_ROOT = Path("/home/martin/ML/Image/CardCls/pokemon_cn_resize392_dinov2/train")
     MODEL_PATH = r"/home/martin/ML/Model/card_cls/yolov11n_card_seg01.onnx"
 
     TARGET_SIZE = 392

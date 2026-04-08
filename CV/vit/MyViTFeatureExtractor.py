@@ -7,8 +7,21 @@ from typing import List, Union
 import logging
 import os
 import torch.nn.functional as F
+import torchvision.transforms.functional as TF
 
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
+
+class PadToSquare:
+    def __init__(self, fill=(128, 128, 128)):
+        self.fill = fill
+
+    def __call__(self, img):
+        w, h = img.size
+        max_wh = max(w, h)
+        pad_w = max_wh - w
+        pad_h = max_wh - h
+        padding = (pad_w // 2, pad_h // 2, pad_w - pad_w // 2, pad_h - pad_h // 2)
+        return TF.pad(img, padding, fill=self.fill, padding_mode='constant')
 
 
 class MyViTFeatureExtractor:
@@ -39,6 +52,7 @@ class MyViTFeatureExtractor:
 
         # 定义预处理 (与训练时的 Val Transform 保持一致)
         self.transform = transforms.Compose([
+            PadToSquare(fill=(128, 128, 128)),
             transforms.Resize((224, 224)),
             transforms.ToTensor(),
             transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225]),
@@ -162,14 +176,14 @@ def compare_images(extractor, img_path_A, img_path_B):
 if __name__ == "__main__":
     # ================= 配置 =================
     # 你的模型保存路径
-    MODEL_PATH = "/home/martin/ML/Model/pokemon_cls/vit-base-patch16-224-Pokemon03"
+    MODEL_PATH = "/home/martin/ML/Model/pokemon_cls/vit-base-patch16-224-PokemonCN05_best"
 
     # 这里填入你想测试的两张图片的绝对路径
     # 建议测试：
     # 1. 一张中文卡 vs 同一张的英文卡
     # 2. 一张卡 vs 一张完全不同的卡
-    IMG_1 = r"/home/martin/ML/RemoteProject/untitled10/uploads/伊布us1.png"
-    IMG_2 = r"/home/martin/ML/RemoteProject/untitled10/uploads/伊布tc1.png"
+    IMG_1 = r"/home/martin/ML/Image/CardCls/pokemon_tc_us_Test/train/('1502952', {'tc'}, '臭臭花'), 002/632af6cd-9482-4bc3-8c07-a2a59b4bd74b.png"
+    IMG_2 = r"/home/martin/ML/Image/CardCls/pokemon_tc_us_Test/train/('1502952', {'tc'}, '臭臭花'), 002/632af6cd-9482-4bc3-8c07-a2a59b4bd74b.png"
 
     # ================= 运行 =================
     try:

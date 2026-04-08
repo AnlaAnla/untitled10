@@ -1,12 +1,4 @@
-import sympy as sp
+import shutil
 
-# 定义符号变量
-x = sp.symbols('x')
-
-# 定义函数 y = 2x
-f = 3* x ** 5
-
-# 计算函数的导数（微分）
-f_prime = sp.diff(f, x)
-
-print(f"函数 y = 2x 的导数是: {f_prime}")
+shutil.rmtree("/home/martin/ML/RemoteProject/PokemonCardSearch/app/static/images")
+print("end")

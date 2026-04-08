@@ -8,18 +8,18 @@ from torchvision import datasets, transforms
 from tqdm import tqdm
 from transformers import ViTModel
 from sklearn.metrics import accuracy_score
+import torchvision.transforms.functional as TF
+import random
 
 # ================= 配置区域 =================
-DATA_DIR = r"/home/martin/ML/Image/CardCls/pokemon_tc_us"
-TRAIN_DIR = os.path.join(DATA_DIR, "train_resized")
-SAVE_MODEL_PATH = "/home/martin/ML/Model/pokemon_cls/vit-base-patch16-224-Pokemon03"
+DATA_DIR = r"/home/martin/ML/Image/CardCls/pokemon_cn_224"
+TRAIN_DIR = os.path.join(DATA_DIR, "train")
+SAVE_MODEL_PATH = "/home/martin/ML/Model/pokemon_cls/vit-base-patch16-224-PokemonCN08"
 
 # 恢复路径
 RESUME_PATH = "best_model.pth"
 # RESUME_PATH = None
 
-# 【核心修改 2】Batch Size 调整
-IMAGE_SIZE = 224
 # 单张卡的 Batch Size。V100 16GB 跑 64 比较稳。
 # 双卡并行时，物理总 Batch = 64 * 2 = 128
 BATCH_SIZE = 64
@@ -33,6 +33,52 @@ WEIGHT_DECAY = 0.05
 DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
+class PadToSquare:
+    def __init__(self, fill=(128, 128, 128)):
+        self.fill = fill
+
+    def __call__(self, img):
+        w, h = img.size
+        max_wh = max(w, h)
+        pad_w = max_wh - w
+        pad_h = max_wh - h
+        padding = (pad_w // 2, pad_h // 2, pad_w - pad_w // 2, pad_h - pad_h // 2)
+        return TF.pad(img, padding, fill=self.fill, padding_mode='constant')
+
+
+
+class RandomBackgroundPad:
+    """以一定概率将卡牌稍微缩小，并放置在随机颜色的纯色背景上，模拟拍照时拍到了桌面的情况"""
+
+    def __init__(self, p=0.5, scale_range=(0.85, 0.95)):
+        self.p = p
+        self.scale_range = scale_range
+
+    def __call__(self, img):
+        if random.random() > self.p:
+            return img
+
+        w, h = img.size
+        scale = random.uniform(*self.scale_range)
+        new_w, new_h = int(w * scale), int(h * scale)
+
+        # 缩小图像
+        img_resized = TF.resize(img, (new_h, new_w))
+
+        # 生成随机背景色 (模拟各种颜色的桌面)
+        bg_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+        # 补回原尺寸
+        pad_w = w - new_w
+        pad_h = h - new_h
+        # 随机位置放置 (不一定在正中间，模拟没拍正)
+        left = random.randint(0, pad_w)
+        top = random.randint(0, pad_h)
+        padding = (left, top, pad_w - left, pad_h - top)
+
+        return TF.pad(img_resized, padding, fill=bg_color, padding_mode='constant')
+
+
 # ================= 模型定义 =================
 class MetricViT(nn.Module):
     def __init__(self, num_classes, pretrained_name='google/vit-base-patch16-224'):
@@ -41,27 +87,46 @@ class MetricViT(nn.Module):
         self.vit = ViTModel.from_pretrained(pretrained_name, local_files_only=True)
         self.hidden_dim = self.vit.config.hidden_size
         self.classifier = nn.Linear(self.hidden_dim, num_classes, bias=False)
+        self.s = 30.0  # 缩放因子
+        self.m = 0.35  # CosFace Margin (关键！迫使相似的卡分开)
 
     def forward(self, x, labels=None):
         outputs = self.vit(x)
         cls_token = outputs.last_hidden_state[:, 0]
         # L2 归一化，这对 Metric Learning 至关重要
         features = F.normalize(cls_token, p=2, dim=1)
-
         weight = F.normalize(self.classifier.weight, p=2, dim=1)
-        logits = F.linear(features, weight) * 30.0
 
-        return logits, features
+        # 计算余弦相似度 cos(theta)
+        cosine = F.linear(features, weight)
+
+        if self.training and labels is not None:
+            # -------- CosFace 核心逻辑 --------
+            # 把当前 batch 正确类别的余弦相似度减去 margin
+            target_logits = cosine[torch.arange(x.size(0)), labels] - self.m
+            # 把减去 margin 的值替换回去
+            cosine[torch.arange(x.size(0)), labels] = target_logits
+
+            logits = cosine * self.s
+            return logits, features
+        else:
+            # 推理阶段直接返回
+            logits = cosine * self.s
+            return logits, features
 
 
 # ================= 数据增强 =================
 data_transforms = {
     'train': transforms.Compose([
-        transforms.Resize((240, 240)),
-        transforms.RandomResizedCrop(IMAGE_SIZE, scale=(0.85, 1.0)),
-        transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
-        transforms.RandomRotation(degrees=15),
-        transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.05, hue=0),
+        RandomBackgroundPad(p=0.4, scale_range=(0.85, 0.95)),
+        PadToSquare(fill=(128, 128, 128)),
+        transforms.Resize((224, 224)),
+        # degrees: 微微旋转 | translate: 平移 | scale: 缩放 | shear: 错切(模拟轻微倾斜)
+        transforms.RandomAffine(degrees=5, translate=(0.05, 0.05), scale=(0.95, 1.05), shear=3),
+        transforms.RandomPerspective(distortion_scale=0.2, p=0.4),
+        # 模拟镜头失焦和画质变差 (高斯模糊和锐化)
+        transforms.RandomApply([transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0))], p=0.3),
+        transforms.ColorJitter(brightness=(0.8, 1.3), contrast=(0.7, 1.1)),
         transforms.ToTensor(),
         transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
     ]),
@@ -102,8 +167,7 @@ def main():
     # 2. 精确解冻 Layer 10, 11
     for name, param in model.vit.named_parameters():
         # 解冻最后层 Encoder
-        if ("encoder.layer.9" in name or "encoder.layer.10" in name
-                or "encoder.layer.11" in name):
+        if any(f"encoder.layer.{i}" in name for i in range(4, 12)):
             param.requires_grad = True
 
         # 解冻 ViT 最后的归一化层 (HuggingFace 命名通常是 layernorm 或 pooler)
@@ -170,10 +234,17 @@ def main():
         else:
             backbone_params.append(param)
 
+    # 冻结训练
     optimizer = optim.AdamW([
         {'params': backbone_params, 'lr': 1e-5},  # 骨干层微调 (很小)
         {'params': head_params, 'lr': 1e-4}  # 分类头学习 (标准)
     ], weight_decay=WEIGHT_DECAY)
+
+    # 全训练
+    # optimizer = optim.AdamW([
+    #     {'params': backbone_params, 'lr': 3e-6},  # 骨干层微调 (很小)
+    #     {'params': head_params, 'lr': 3e-5}  # 分类头学习 (标准)
+    # ], weight_decay=WEIGHT_DECAY)
 
     scheduler = optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=EPOCHS)
     criterion = nn.CrossEntropyLoss()
@@ -199,7 +270,7 @@ def main():
                 inputs, labels = inputs.to(DEVICE), labels.to(DEVICE)
 
                 with torch.amp.autocast('cuda'):
-                    logits, feats = model(inputs)
+                    logits, feats = model(inputs, labels)
                     loss = criterion(logits, labels) / GRAD_ACCUMULATION_STEPS
 
                 scaler.scale(loss).backward()
@@ -235,6 +306,10 @@ def main():
             state_dict = model.module.state_dict() if isinstance(model, nn.DataParallel) else model.state_dict()
             torch.save(state_dict, "best_model.pth")
             print(f"★ 保存最佳模型 (Acc: {best_acc:.4f})")
+
+            best_backbone_dir = SAVE_MODEL_PATH + "_best"
+            real_model_to_save = model.module if isinstance(model, nn.DataParallel) else model
+            real_model_to_save.vit.save_pretrained(best_backbone_dir)
 
         # 每个 epoch 结束后更新学习率
         scheduler.step()

@@ -3,6 +3,7 @@ from rapidocr import RapidOCR
 from PIL import Image
 import difflib
 
+
 def ocr_card_bottom_left(image_path, crop_ratio=(0.5, 0.2)):
     """
     使用YOLO检测卡片, 裁剪卡片左下角, 并用RapidOCR识别文字.
@@ -53,9 +54,9 @@ if __name__ == '__main__':
     ocr_engine = RapidOCR()
 
     img_paths = [
-        r"C:\Code\ML\Image\_TEST_DATA\Card_test\test05\945e0cc0884c8766a5883ea9593def9d.png",
-        r"C:\Code\ML\Image\_TEST_DATA\Card_test\test05\65a2343f60f0115a639bf03a162d9ab8.png",
-        r"C:\Code\ML\Image\_TEST_DATA\Card_test\test05\dfdb29923d90bfc254903d940fa1fd83.png"
+        r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_cn\10252,水箭龟,014_066,Reverse Holo\521a759328aac37a331cdd742f3ef64c.png",
+        # r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_cn\139,怨影娃娃,039_151\5ee7f6a620216b5fff28cebc683879fb.png",
+        # r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_cn\152,胡帕,052_151\e2a6579b4dfc8d36422da90378f1c8f7.png"
     ]
 
     text_list = []
@@ -69,4 +70,3 @@ if __name__ == '__main__':
         for text_str in text.split(" "):
             if '/' in text_str:
                 print(text_str)
-

@@ -2,30 +2,74 @@ import os
 import matplotlib.pyplot as plt
 from PIL import Image
 from torchvision import transforms
+import torchvision.transforms.functional as TF
+import random
 
 # ================= 配置区域 =================
 # 替换为你想要测试的图片路径
-IMG_PATH = r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_tc\('1502952', {'tc'}, '臭臭花'), 002\632af6cd-9482-4bc3-8c07-a2a59b4bd74b.png"
+IMG_PATH = r"C:\Code\ML\Project\PokemonCardSearch\temp_yolo.jpg"
+
+class PadToSquare:
+    def __init__(self, fill=(128, 128, 128)):
+        self.fill = fill
+
+    def __call__(self, img):
+        w, h = img.size
+        max_wh = max(w, h)
+        pad_w = max_wh - w
+        pad_h = max_wh - h
+        padding = (pad_w // 2, pad_h // 2, pad_w - pad_w // 2, pad_h - pad_h // 2)
+        return TF.pad(img, padding, fill=self.fill, padding_mode='constant')
+
+
+class RandomBackgroundPad:
+    """以一定概率将卡牌稍微缩小，并放置在随机颜色的纯色背景上，模拟拍照时拍到了桌面的情况"""
+
+    def __init__(self, p=0.5, scale_range=(0.85, 0.95)):
+        self.p = p
+        self.scale_range = scale_range
+
+    def __call__(self, img):
+        if random.random() > self.p:
+            return img
+
+        w, h = img.size
+        scale = random.uniform(*self.scale_range)
+        new_w, new_h = int(w * scale), int(h * scale)
+
+        # 缩小图像
+        img_resized = TF.resize(img, (new_h, new_w))
+
+        # 生成随机背景色 (模拟各种颜色的桌面)
+        bg_color = (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255))
+
+        # 补回原尺寸
+        pad_w = w - new_w
+        pad_h = h - new_h
+        # 随机位置放置 (不一定在正中间，模拟没拍正)
+        left = random.randint(0, pad_w)
+        top = random.randint(0, pad_h)
+        padding = (left, top, pad_w - left, pad_h - top)
+
+        return TF.pad(img_resized, padding, fill=bg_color, padding_mode='constant')
+
 
 # ================= 定义增强 (去掉了缩放和归一化) =================
 # 注意：RandomPerspective 和 GaussianBlur 现在的 torchvision 版本支持直接对 PIL 图像操作
 view_transforms = transforms.Compose([
     # ---------------- 被移除的缩放层 ----------------
-    transforms.Resize((240, 240)),
-    transforms.RandomResizedCrop(224, scale=(0.85, 1.0)),
+    RandomBackgroundPad(p=0.4, scale_range=(0.85, 0.95)),
+    PadToSquare(fill=(128, 128, 128)),
+
+    transforms.Resize((224, 224)),
 
     # ---------------- 保留的增强层 ----------------
-    # 透视变换 (模拟拍摄角度倾斜)
-    transforms.RandomPerspective(distortion_scale=0.4, p=0.5),
+    # degrees: 微微旋转 | translate: 平移 | scale: 缩放 | shear: 错切(模拟轻微倾斜)
+    transforms.RandomAffine(degrees=5, translate=(0.05, 0.05), scale=(0.95, 1.05), shear=3),
+    transforms.RandomPerspective(distortion_scale=0.2, p=0.4),
+    transforms.ColorJitter(brightness=(0.8, 1.3), contrast=(0.7, 1.1)),
 
-    # 随机旋转 (模拟卡片没摆正)
-    transforms.RandomRotation(degrees=15),
-
-    # 颜色抖动 (模拟光照、色差)
-    transforms.ColorJitter(brightness=0.3, contrast=0.2, saturation=0.05, hue=0),
-
-    # 高斯模糊 (模拟对焦不准)
-    # transforms.GaussianBlur(kernel_size=3, sigma=0.01),
+    transforms.RandomApply([transforms.GaussianBlur(kernel_size=3, sigma=(0.1, 1.0))], p=0.3),
 
     # ---------------- 被移除的张量化和归一化 ----------------
     # transforms.ToTensor(),

@@ -1,14 +1,20 @@
-from typing import List
+import os
 
-class Solution:
-    def lengthOfLIS(self, nums: List[int]) -> int:
-        ans = [1]*len(nums)
-        for i in range(len(nums)):
-            for j in range(i):
-                if nums[i] > nums[j]:
-                    ans[i] = max(ans[i], ans[j]+1)
-        print(ans)
-        return max(ans)
+dir_path = r"C:\Code\ML\Image\_CLASSIFY\card_cls2\Pokemon01\pokemon_cn"
 
-data = [10,9,2,5,3,7,101,18]
-print(Solution().lengthOfLIS(data))
+count = 0
+name_list = []
+for file_name in os.listdir(dir_path):
+    names = file_name.split(",")
+    if len(names) == 3:
+        item = f"{names[1]},{names[2]}"
+    if len(names) == 4:
+        item = f"{names[1]},{names[2]},{names[3]}"
+    # print(item)
+    if item in name_list:
+        count += 1
+        print(file_name)
+        # break
+    name_list.append(item)
+
+print(count)
